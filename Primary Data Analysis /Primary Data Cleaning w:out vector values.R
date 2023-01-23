@@ -221,10 +221,10 @@ HLS2$Q35 <- as.numeric(c("Yes" = "1", "No" = "2")[HLS2$Q35])
 # Do you plan to get you child/children vaccinated in the future  
 HLS2$Q36 <- as.numeric(c("Yes" = "1", "No" = "2","Not sure" = "3", "Do not know" = "4")[HLS2$Q36]) 
 
-#saving as xlsx file
+#saving as xlsx file so you can edit in excel and upload to codebook
 install.packages("writexl")
 library("writexl")
 ##setting working directory to desktop then saving the file 
 setwd("~/Desktop")
-write_xlsx(HLS2, "HLS2.xlsx")
+write_xlsx(ACSD, "ASU_Combined.xlsx")
 
