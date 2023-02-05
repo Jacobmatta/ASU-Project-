@@ -1,7 +1,13 @@
 #library need 
 library(readxl) 
+library(here)
+
 #import data 
-Health_Literacy_Survey_full_survey_January_20_2023_08_01 <- read_excel("Downloads/Health Literacy Survey (full survey)_January 20, 2023_08.01.xlsx")
+Data_location = here::here("Primary Data Analysis ","data","raw data ","Health Literacy Survey (full survey)_February 5, 2023_11.41.xlsx")
+
+Rawdata = readxl::read_excel(Data_location)
+
+Data_location
 
 #duplicating data 
 HLS2 <- Health_Literacy_Survey_full_survey_January_20_2023_08_01
@@ -226,5 +232,5 @@ install.packages("writexl")
 library("writexl")
 ##setting working directory to desktop then saving the file 
 setwd("~/Desktop")
-write_xlsx(ACSD, "ASU_Combined.xlsx")
+write_xlsx(CAC, "ASU_Combined.xlsx")
 
