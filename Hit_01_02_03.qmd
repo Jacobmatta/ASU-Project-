@@ -22,8 +22,14 @@ datalocation <- here("Primary Data Analysis", "data", "raw data", "ASU_Paper_Qua
 
 rawdata <- readxl::read_xlsx(datalocation)
 
+#look at data
+summary(rawdata)
+
+#removing rows from 310 and higher because only dates up until Dec. 31st are needed
+Rawdata_dec31st <- rawdata[-c(310:488),]
+
 #getting a count for our indicator PM #5 HC-HIT 01  
-Q32 = rawdata$Question_32
+Q32 = Rawdata_dec31st$Question_32
 
 #replacing NA values with *
 Q32 = Q32 %>% replace(is.na(.), "*")
@@ -33,7 +39,7 @@ describe(Q32)
 
 #making clean datatable with summary of question 32
 Q32_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                         Frequency = c(49, 404, 17, 14, 4))
+                          Frequency = c(38, 247, 12, 9, 3))
 Q32_summary
 ```
 
@@ -43,17 +49,17 @@ Question 33: "Were you satisfied with the communication regarding COVID-19 healt
 
 ```{r}
 #getting a count for our indicator PM #5 HC-HIT 01  
-Q33 = rawdata$Question_33
+Q33 = Rawdata_dec31st$Question_33
 
 #replacing NA values with *
 Q33 = Q33 %>% replace(is.na(.), "*")
 
-#getting summary of question 32
+#getting summary of question 33
 describe(Q33) 
 
-#making clean datatable with summary of question 32
+#making clean datatable with summary of question 33
 Q33_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                          Frequency = c(49, 414, 9, 12, 4))
+                          Frequency = c(38, 258, 4, 6, 3))
 Q33_summary
 ```
 
@@ -62,7 +68,7 @@ Q33_summary
 Question 34: "Were you involved in decisions regarding COVID-19 vaccination decisions made today?"
 
 ```{r}
-Q34 = rawdata$Question_34
+Q34 = Rawdata_dec31st$Question_34
 
 #replacing NA values with *
 Q34 = Q34 %>% replace(is.na(.), "*")
@@ -72,6 +78,6 @@ describe(Q34)
 
 #making clean datatable with summary of question 34
 Q34_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                          Frequency = c(57, 323, 78, 21, 9))
+                          Frequency = c(46, 189, 55, 14, 5))
 Q34_summary
 ```

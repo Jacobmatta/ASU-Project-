@@ -34,7 +34,7 @@ describe(Q32)
 
 #making clean datatable with summary of question 32
 Q32_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                          Frequency = c(49, 404, 17, 14, 4))
+                          Frequency = c(38, 247, 12, 9, 3))
 Q32_summary
 
 ############################################################### HC-HIT-02
@@ -50,7 +50,7 @@ describe(Q33)
 
 #making clean datatable with summary of question 33
 Q33_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                          Frequency = c(49, 414, 9, 12, 4))
+                          Frequency = c(38, 258, 4, 6, 3))
 Q33_summary
 
 ############################################################### HC-HIT-03
@@ -65,5 +65,5 @@ describe(Q34)
 
 #making clean datatable with summary of question 34
 Q34_summary = data.frame (Value  = c("Missing", "Yes","No", "Not sure", "Do not know"),
-                          Frequency = c(57, 323, 78, 21, 9))
+                          Frequency = c(46, 189, 55, 14, 5))
 Q34_summary
