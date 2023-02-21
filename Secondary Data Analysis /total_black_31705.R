@@ -136,8 +136,9 @@ Zip_31705_combined_total_vax_by_dates <- data.frame(Date = c("Sept17", "Oct1", "
 
 ##ggplot 
 Zip_31705_combined_total_vax_by_dates_plot = Zip_31705_combined_total_vax_by_dates %>% 
-  ggplot(aes(Date, Total, group=1)) + geom_point() + geom_line() + scale_x_discrete(limits = c("Sept17", "Oct1", "Oct8", "Oct14","Oct20","Oct28","Nov3","Nov8","Nov17","Nov24","Dec1", "Dec8", "Dec16", "Dec22", "Dec29", "Jan5", "Jan12", "Jan19", "Jan26", "Feb2", "Feb9", "Feb16"))
-Zip_31705_combined_total_vax_by_dates_plot
+  ggplot(aes(Date, Total, group=1)) + geom_point() + geom_line() + scale_x_discrete(limits =c("Sept17", "Oct1","Nov3","Dec1", "Jan5", "Feb16"))
+
+Zip_31705_combined_total_vax_by_dates_plot + ggtitle("Vaccination Totals by Month of African Americans in the 31705 Zipcode") + theme(plot.title = element_text(color="red", size=12, face="bold.italic"))
 
 #saving
 save.image("~/Documents/R/ASU-Project-/total_black_31705.RData")
