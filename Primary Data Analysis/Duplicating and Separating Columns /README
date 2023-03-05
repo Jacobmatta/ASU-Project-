@@ -1,7 +1,0 @@
-1. Prior to uploading the data to R, make sure to edit the excel file by removing old entries, removing that first blank line of the excel document, change question 13 variable to "Conditions"
-2. Run code in the "Primary Data Cleaning w:out vector" file that
-3. Run code in "Separating how did you hear " file for Q30 (qualtrics) and Q38 (codebook)
-4. Run code in "Separating Preventions" file
-5. Run code in "Separating symptoms"
-6. Run code in "Separating Who provided information"
-7. Run removing excess 2s files 
