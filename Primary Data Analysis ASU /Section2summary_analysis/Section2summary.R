@@ -10,10 +10,14 @@ library(data.table)
 library(stringi)
 library(Hmisc)
 library(ggplot2)
+library(DescTools)
 
 #importing the file with surveys up until Feb 28th 
 #you will have to chane the file location 
-ASU_Paper_Qualtrics_Merged <- read_excel("~/Desktop/ASU_Paper_Qualtrics_Merged_Feb28.xlsx")
+location = here("Primary Data Analysis ASU ", "Data", "rawdata", "ASU_Paper_Qualtrics_Merged_Feb28.xlsx")
+
+#naming the rawdata 
+ASU_Paper_Qualtrics_Merged = read_excel(location)
 
 
 #removing the space from the Health_Insurance variable name 
@@ -193,9 +197,7 @@ age = age %>% replace(is.na(.), "missing")
 insurance = insurance %>% replace(is.na(.), "missing")
 
 #creating frequency table for race
-describe(race) #offers frequency and proportion of response 
-table(race)
-race_tib = tibble(race) #used to make a tibble out of the count 
+race_tib = PercTable(race)
 
 #making a bar graph of race of participants 
 race_barplot = ggplot(race_tib , aes(x=race, fill=race)) + #have to use the tibble of the count of race here 
@@ -205,9 +207,7 @@ race_barplot = ggplot(race_tib , aes(x=race, fill=race)) + #have to use the tibb
 race_barplot + ggtitle("Count of Participant by Race")
 
 #creating a frequency table for age 
-describe(age) #offers frequency and proportion of response 
-table(age)
-age_tib = tibble(age) #used to make a tibble out of the count 
+age_tib = PercTable(age)
 
 #making a bar graph of age of participants 
 age_barplot = ggplot(age_tib , aes(x=age, fill=age)) + #have to use the tibble of the count of race here 
@@ -218,9 +218,7 @@ age_barplot = ggplot(age_tib , aes(x=age, fill=age)) + #have to use the tibble o
 age_barplot + ggtitle("Count of Participant by age") 
 
 #creating frequency table for insurance 
-describe(insurance) #offers frequency and proportion of response 
-table(insurance)
-insurance_tib = tibble(insurance) #used to make a tibble out of the count 
+insurance_tib = PercTable(insurance)
 
 #making a bar graph of insurance of participants 
 insurance_barplot = ggplot(insurance_tib , aes(x=insurance, fill=insurance)) + #have to use the tibble of the count of race here 
@@ -229,7 +227,25 @@ insurance_barplot = ggplot(insurance_tib , aes(x=insurance, fill=insurance)) + #
   theme(legend.position="right", axis.title.x=element_blank(),axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) 
 insurance_barplot + ggtitle("Count of Participant by insurance") 
+#######################################################################summing insurance by race
 
+# Use table() function to get frequency table for insurance by Race
+insurance_race_freq = PercTable(insurance,race)
+insurance_race_freq
+
+#preparing to graph insurance by race
+insurance_by_race <- Feb28 %>%
+  dplyr::group_by(Race_Ethnicity, Health_Insurance) %>%
+  dplyr::summarise(Frequency = n()) %>%
+  dplyr::mutate(Percent = round(Frequency/sum(Frequency)*100, 1)) 
+
+#making a bar graph of insurance of participants 
+insurance_barplot = ggplot(Feb28, aes(x=Health_Insurance, fill=Race_Ethnicity)) + #have to use the tibble of the count of race here 
+  geom_bar( ) +
+  scale_fill_hue(c = 40) +
+  theme(legend.position="right", axis.text.x=element_text(size=5)) 
+insurance_barplot = insurance_barplot + ggtitle("Count of Participant insurance by race")   
+insurance_barplot  
 ######################################################### question 1 by race, age and insurance 
 
 #summing question 1 by age
@@ -239,10 +255,8 @@ Q1 = Feb28$Question_1
 #replacing NA values with "missing" for both age and Q1 
 Q1 = Q1 %>% replace(is.na(.), "missing")
 
-#creating frequency table for insurance 
-describe(Q1)
-table(Q1)
-Q1_tib = tibble(Q1)
+#creating frequency table for Q1 
+PercTable(Q1)
 
 #making a bar graph of Q1 of participants 
 Q1_barplot = ggplot(Q1_tib , aes(x=Q1, fill=Q1)) + #have to use the tibble of the count of race here 
@@ -260,15 +274,14 @@ Q1_barplot = Q1_barplot + theme(plot.title = element_text(color = "black"),
 Q1_barplot
 
 # Use table() function to get frequency table for Q1 vs Race
-Q1_race_freq = table(Q1, race)
+Q1_race_freq = PercTable(Q1,race)
 Q1_race_freq
-
 # Use table() function to get frequency table for Q1 vs Age
-Q1_age_freq = table(Q1, age)
+Q1_age_freq = PercTable(Q1, age)
 Q1_age_freq
 
 # Use table() function to get frequency table for Q1 vs insurance
-Q1_insurance_freq = table(Q1, insurance)
+Q1_insurance_freq = PercTable(Q1, insurance)
 Q1_insurance_freq
 
 #########################################################question 2 by race, age and insurance 
