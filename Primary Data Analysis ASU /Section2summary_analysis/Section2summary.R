@@ -185,49 +185,55 @@ Feb28$Question_21 <- ifelse(Feb28$Question_21 == 1, "Yes",
                             ifelse(Feb28$Question_21 == 2, "No",
                                    ifelse(Feb28$Question_21 == 3, "Not sure",
                                           ifelse(Feb28$Question_21 == 4, "Do not know", NA))))
-###########################################################Summary for race, age and insurance
-#creating values for race, age and insurance questions
-race = Feb28$Race_Ethnicity
-age = Feb28$Age
-insurance = Feb28$Health_Insurance
 
-#replacing NA values with "missing" 
-race = race %>% replace(is.na(.), "missing")
-age = age %>% replace(is.na(.), "missing")
-insurance = insurance %>% replace(is.na(.), "missing")
+################################################################Summary for race
+#changes NA values to missing 
+race = Feb28$Race_Ethnicity %>% replace(is.na(.), "*")
 
-#creating frequency table for race
-race_tib = PercTable(race)
+race_pertable= PercTable(race)
+race_pertable
 
 #making a bar graph of race of participants 
-race_barplot = ggplot(race_tib , aes(x=race, fill=race)) + #have to use the tibble of the count of race here 
-  geom_bar( ) +
+#note that "missing" is notes by NA in the graph 
+race_barplot = ggplot(Feb28, aes(x=Race_Ethnicity, fill= Race_Ethnicity)) + 
+  geom_bar() +
   scale_fill_hue(c = 40) +
-  theme(legend.position="none") 
+  theme(legend.position="right",axis.title.x=element_blank(),axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) 
 race_barplot + ggtitle("Count of Participant by Race")
 
-#creating a frequency table for age 
-age_tib = PercTable(age)
+###############################################################Summary for age
+#changes NA values to missing 
+Age = Feb28$Age %>% replace(is.na(.), "*")
 
-#making a bar graph of age of participants 
-age_barplot = ggplot(age_tib , aes(x=age, fill=age)) + #have to use the tibble of the count of race here 
-  geom_bar( ) +
+Age_pertable= PercTable(Age)
+Age_pertable
+
+#making a bar graph of Age of participants 
+#note that "missing" is notes by NA in the graph 
+Age_barplot = ggplot(Feb28, aes(x=Age, fill= Age)) + 
+  geom_bar() +
   scale_fill_hue(c = 40) +
-  theme(legend.position="right", axis.title.x=element_blank(),axis.text.x=element_blank(),
+  theme(legend.position="right",axis.title.x=element_blank(),axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) 
-age_barplot + ggtitle("Count of Participant by age") 
+Age_barplot + ggtitle("Count of Participant by Age")
 
-#creating frequency table for insurance 
-insurance_tib = PercTable(insurance)
+############################################################Summary for insurance
+#changes NA values to missing 
+Health_Insurance = Feb28$Health_Insurance %>% replace(is.na(.), "*")
 
-#making a bar graph of insurance of participants 
-insurance_barplot = ggplot(insurance_tib , aes(x=insurance, fill=insurance)) + #have to use the tibble of the count of race here 
-  geom_bar( ) +
+Health_Insurance_pertable= PercTable(Health_Insurance)
+Health_Insurance_pertable
+
+#making a bar graph of Health_Insurance of participants 
+#note that "missing" is notes by NA in the graph 
+Health_Insurance_barplot = ggplot(Feb28, aes(x=Health_Insurance, fill= Health_Insurance)) + 
+  geom_bar() +
   scale_fill_hue(c = 40) +
-  theme(legend.position="right", axis.title.x=element_blank(),axis.text.x=element_blank(),
+  theme(legend.position="right",axis.title.x=element_blank(),axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) 
-insurance_barplot + ggtitle("Count of Participant by insurance") 
-#######################################################################summing insurance by race
+Health_Insurance_barplot + ggtitle("Count of Participant by Health_Insurance")
+#######################################################################summary for insurance by race
 
 # Use table() function to get frequency table for insurance by Race
 insurance_race_freq = PercTable(insurance,race)
