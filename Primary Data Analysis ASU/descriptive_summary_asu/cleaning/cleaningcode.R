@@ -14,7 +14,7 @@ library(DescTools)
 library(here)
 
 #importing the file with surveys up until Feb 28th 
-location = here("Primary Data Analysis ASU ","Section2summary_analysis", "Data", "rawdata", "ASU_Paper_Qualtrics_Merged_Feb28.xlsx")
+location = here("Primary Data Analysis ASU","descriptive_summary_asu", "Data", "rawdata", "ASU_Paper_Qualtrics_Merged_Feb28.xlsx")
 
 #naming the rawdata 
 ASU_Paper_Qualtrics_Merged = read_excel(location)
@@ -379,10 +379,10 @@ Feb28$Question_42 <- ifelse(Feb28$Question_42 == 1, "Yes",
                             ifelse(Feb28$Question_42 == 2, "No", NA))
 
 ##Question_43
-Feb28$Question_43 <- ifelse(Feb28$Question_43 == "Yes", 1, 
-                                         ifelse(Feb28$Question_43 == "No", 2,
-                                                ifelse(Feb28$Question_43 == "Not sure", 3,
-                                                       ifelse(Feb28$Question_43 == "Do not know", 4, NA))))
+Feb28$Question_43 <- ifelse(Feb28$Question_43 == 1, "Yes", 
+                                         ifelse(Feb28$Question_43 == 2, "No",
+                                                ifelse(Feb28$Question_43 == 3, "Not sure",
+                                                       ifelse(Feb28$Question_43 == 4, "Do not know", NA))))
 ##Question_44
 Feb28$Question_44 <- ifelse(Feb28$Question_44 == 1, "Strongly Disagree", 
                             ifelse(Feb28$Question_44 == 2, "Disagree",

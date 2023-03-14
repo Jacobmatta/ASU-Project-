@@ -633,6 +633,12 @@ Question_42_pertable
 # Summary for Question_43: do you plan to get you child/children vaccinated in the near future? 
 #missing
 
+Question_43 = Feb28$Question_43 %>% replace(is.na(.), "*")
+
+Question_43_pertable= PercTable(Question_43)
+Question_43_pertable
+```
+
 #--------------------------------------SECTION4---------------------------------------------------#
 
 # Summary for Question_44:  Getting sick from multiple dose of COVID-19 vaccine is of concern  
