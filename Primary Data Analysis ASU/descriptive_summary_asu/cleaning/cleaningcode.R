@@ -26,8 +26,60 @@ colnames(ASU_Paper_Qualtrics_Merged)[which(names(ASU_Paper_Qualtrics_Merged) == 
 #coping the data set and identifying it by the date it was merged 
 Feb28 = ASU_Paper_Qualtrics_Merged
 
+#changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing 
+Feb28$Question_2[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_3[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_4[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_5[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_6[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_7[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_8[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_9[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_10[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_11[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_12[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Fever[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Cough[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Shortness_of_breath[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Fatigue[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Muscle_Body_Aches[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Headache[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Loss_of_Taste[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Sore_Throat[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Congestion[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Nausea[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Diarrhea[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Asymptomatic[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_13_Other[Feb28$Question_1 > 1 ] <- "*"
+Feb28$Question_14[Feb28$Question_1 > 1 ] <- "*"
+
+#If question 22 (3.1) was reported as No, Not Sure or do not know then question 23 (3.2) should be reported as misssing 
+Feb28$Question_23[Feb28$Question_22 > 1 ] <- "*"
+
+#If question 25 (3.7) was reported as yes then Question 27 (were you vaccinated in the past), Question 28 (Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should all be missing 
+Feb28$Question_27[Feb28$Question_25 == 1 ] <- "*"
+Feb28$Question_28[Feb28$Question_25 == 1 ] <- "*"
+Feb28$Question_29[Feb28$Question_25 == 1 ] <- "*"
+
+#If question 25 was reported as no then question 26 (was this your first dose) should be reported as missing 
+Feb28$Question_26[Feb28$Question_25 > 1 ] <- "*"
+
+#if question 27(were you vaccinated in the past) was answered yes then question 28(Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should be missing 
+Feb28$Question_28[Feb28$Question_27 == 1 ] <- "*"
+Feb28$Question_29[Feb28$Question_27 == 1 ] <- "*"
+
+#if question 40 (did your child or children also get the vaccine today?) was reported as yes then question 42 (was your child vaccinated in the past) and question 43 (do you plan to get your child vaccinated in the near future) should both be missing 
+Feb28$Question_42[Feb28$Question_40 == 1 ] <- "*"
+Feb28$Question_43[Feb28$Question_40 == 1 ] <- "*"
+
+#if question 40 was reported as no or as "I do not have children under 18 in my household" then question 41 (was the dose your child received their first dose)should be missing 
+Feb28$Question_41[Feb28$Question_40 > 1 ] <- "*"
+
+#if question 42 was reported as yes then question 43 should be missing 
+Feb28$Question_43[Feb28$Question_42 == 1 ] <- "*"
+
 #changing numeric responses to characters for data summary
-#doing this so we do not have to turn to the codebook for interpretation
+#doing this so we do not have to turn to the code book for interpretation
 
 ##Gender
 Feb28$Gender <- ifelse(Feb28$Gender == 1, "Male", 

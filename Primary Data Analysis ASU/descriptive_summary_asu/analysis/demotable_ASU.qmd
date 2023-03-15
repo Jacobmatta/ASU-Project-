@@ -1,6 +1,6 @@
 ---
 title: "Demographics table"
-format: doc
+format: docx
 editor: visual
 echo: false 
 ---
