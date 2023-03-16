@@ -57,3 +57,31 @@ df <- data.frame(Item, Strongly_Disagree, Disagree, Neutral, Agree, Strongly_Agr
 #creating plot 
 plot(likert(summary = df), legend.position="right", plot.percent.neutral=FALSE, plot.percent.low = FALSE, plot.percent.high = FALSE) + 
   scale_fill_manual(values = brewer.pal(n=5,"RdYlBu"), breaks = c("Strongly_Disagree", "Disagree", "Neutral","Agree", "Strongly_Agree")) #order and color the likert boxes
+
+
+#########likert scale for question 1 yes vs I (or my chidlren) am at risk of getting a COVID-19 infection” 
+Item = c("Elderly", "Child")
+Strongly_Disagree = c(4.081633, 7.15)
+Disagree = c(4.591837, 8.86)
+Neutral = c(3.741497, 9.03)
+Agree = c(4.08, 7.49)
+Strongly_Agree = c(2.72, 4.43)
+
+
+df3 = data.frame(Item, Strongly_Disagree, Disagree, Neutral, Agree, Strongly_Agree)
+
+plot(likert(summary = df3), legend.position="right", plot.percent.neutral=FALSE, plot.percent.low = FALSE, plot.percent.high = FALSE) + 
+  scale_fill_manual(values = brewer.pal(n=5,"RdYlBu"), breaks = c("Strongly_Disagree", "Disagree", "Neutral","Agree", "Strongly_Agree")) #order and color the likert boxes
+
+#########likert scale for question 1 no vs I (or my chidlren) am at risk of getting a COVID-19 infection” 
+Item = c("Elderly", "Child")
+Strongly_Disagree = c(15.99, 13.11)
+Disagree = c(19.39, 8.86)
+Neutral = c(19.39, 14.14)
+Agree = c(18.54, 14.99)
+Strongly_Agree = c(7.48, 5.79)
+
+df4 = data.frame(Item, Strongly_Disagree, Disagree, Neutral, Agree, Strongly_Agree)
+
+plot(likert(summary = df4), legend.position="right", plot.percent.neutral=FALSE, plot.percent.low = FALSE, plot.percent.high = FALSE) + 
+  scale_fill_manual(values = brewer.pal(n=5,"RdYlBu"), breaks = c("Strongly_Disagree", "Disagree", "Neutral","Agree", "Strongly_Agree")) #order and color the likert boxes
