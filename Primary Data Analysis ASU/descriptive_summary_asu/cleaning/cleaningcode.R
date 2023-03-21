@@ -26,6 +26,16 @@ colnames(ASU_Paper_Qualtrics_Merged)[which(names(ASU_Paper_Qualtrics_Merged) == 
 #coping the data set and identifying it by the date it was merged 
 Feb28 = ASU_Paper_Qualtrics_Merged
 
+#changing all values to missing of Number_of_children_1, Number_of_children_2 and Number_of_children_3 when Children was answered "No" (2)
+Feb28$Number_children_1[Feb28$Children = 2 ] <- "*"
+Feb28$Number_children_2[Feb28$Children = 2 ] <- "*"
+Feb28$Number_children_3[Feb28$Children = 2 ] <- "*"
+
+#changing all values to missing of Number_elderly_1, Number_elderly_2 Elderly_family was answered "No" (2)
+Feb28$Number_elderly_1[Feb28$Elderly_family = 2 ] <- "*"
+Feb28$Number_elderly_2[Feb28$Elderly_family = 2 ] <- "*"
+
+
 #changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing 
 Feb28$Question_2[Feb28$Question_1 > 1 ] <- "*"
 Feb28$Question_3[Feb28$Question_1 > 1 ] <- "*"
