@@ -21,7 +21,7 @@ library(naniar)
 
 ```{r}
 ## Loading 
-data_location = here("Primary Data Analysis ASU", "descriptive_summary_asu","Data", "cleandata", "Feb28.rds")
+data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "Feb28.rds")
 Feb28 = readRDS(data_location)
 
 ```

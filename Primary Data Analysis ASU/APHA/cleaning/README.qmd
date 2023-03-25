@@ -1,0 +1,4 @@
+1. Run `qualtrics_data_cleaning_merging_code.R` when attempting to combine paper and qualtrics surveys
+
+2. Run `cleaningcode.R` when reruning descriptive analysis cleaning
+-     puts data back into character values 

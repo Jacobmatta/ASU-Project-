@@ -26,6 +26,7 @@ colnames(ASU_Paper_Qualtrics_Merged)[which(names(ASU_Paper_Qualtrics_Merged) == 
 #coping the data set and identifying it by the date it was merged 
 Feb28 = ASU_Paper_Qualtrics_Merged
 
+
 #changing all values to missing of Number_of_children_1, Number_of_children_2 and Number_of_children_3 when Children was answered "No" (2)
 Feb28$Number_children_1[Feb28$Children = 2 ] <- "*"
 Feb28$Number_children_2[Feb28$Children = 2 ] <- "*"

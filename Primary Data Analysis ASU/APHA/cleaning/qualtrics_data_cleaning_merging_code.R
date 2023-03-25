@@ -6,12 +6,13 @@ library(readxl)
 library(writexl)
 library(data.table)
 library(stringi)
-
+library(here)
+library(openxlsx) #for saving excel file 
 
 
 #Step 1: Preparing the data
   ##Loading the Qualtrics Data
-    asu_qualtrics_data <- read_excel("/Users/jacobmatta/Desktop/asu_qualtrics_data.xlsx")
+    asu_qualtrics_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "asu_qualtrics_data_march25.xlsx"))
     names(asu_qualtrics_data)
     View(asu_qualtrics_data)
   ##Removing unwanted columns and rows
@@ -28,7 +29,7 @@ library(stringi)
     asu_qualtrics_data$Participant_dob <- gsub('[^[:alnum:] ]', '', asu_qualtrics_data$Participant_dob) #Removes all special characters from DOB
     asu_qualtrics_data$Participant_dob_new <- paste(str_sub(asu_qualtrics_data$Participant_dob, start = 1, end = 2), str_sub(asu_qualtrics_data$Participant_dob, -4), sep = "") #Formatting the date of birth as MMYYYY
   ##Restructuring the Participant Name
-    setDT(asu_qualtrics_data)[, paste0("Participant_name", 1:3) := tstrsplit(Participant_name," ")] #separating the participate name into three columns
+    setDT(asu_qualtrics_data)[, paste0("Participant_name", 1:4) := tstrsplit(Participant_name," ")] #separating the participate name into three columns
     asu_qualtrics_data$Participant_name1 <- ifelse(is.na(asu_qualtrics_data$Participant_name1), "", asu_qualtrics_data$Participant_name1)
     asu_qualtrics_data$Participant_name2 <- ifelse(is.na(asu_qualtrics_data$Participant_name2), "", asu_qualtrics_data$Participant_name2)
     asu_qualtrics_data$Participant_name3 <- ifelse(is.na(asu_qualtrics_data$Participant_name3), "", asu_qualtrics_data$Participant_name3)
@@ -436,7 +437,7 @@ library(stringi)
     asu_qualtrics_data <- asu_qualtrics_data %>% mutate(Conditions_Other = ifelse(Conditions1 == "Other" | Conditions2 == "Other" | Conditions3 == "Other" | Conditions4 == "Other" | Conditions5 == "Other" | Conditions6 == "Other" | Conditions7 == "Other", 1, NA))
     asu_qualtrics_data <- asu_qualtrics_data %>% mutate(Conditions_No_Conditions = ifelse(Conditions1 == "No conditions" | Conditions2 == "No conditions" | Conditions3 == "No conditions" | Conditions4 == "No conditions" | Conditions5 == "No conditions" | Conditions6 == "No conditions" | Conditions7 == "No conditions", 1, NA))
   ##Question_13
-    setDT(asu_qualtrics_data)[, paste0("Question_13", 1:11) := tstrsplit(Question_13, " ,")] #separating the symptoms into 11 columns (maximum number of symptoms a participant has mentioned to have had) 
+    setDT(asu_qualtrics_data)[, paste0("Question_13", 1:12) := tstrsplit(Question_13, " ,")] #separating the symptoms into 11 columns (maximum number of symptoms a participant has mentioned to have had) 
     asu_qualtrics_data <- asu_qualtrics_data %>% mutate(Question_13_Fever = ifelse(Question_131 == "Fever or chills" | Question_132 == "Fever or chills" | Question_133 == "Fever or chills" | Question_134 == "Fever or chills" | Question_135 == "Fever or chills" | Question_136 == "Fever or chills" | Question_137 == "Fever or chills" | Question_138 == "Fever or chills" | Question_139 == "Fever or chills" | Question_1310 == "Fever or chills" | Question_1311 == "Fever or chills ", 1, NA))
     asu_qualtrics_data <- asu_qualtrics_data %>% mutate(Question_13_Cough = ifelse(Question_131 == "Cough" | Question_132 == "Cough" | Question_133 == "Cough" | Question_134 == "Cough" | Question_135 == "Cough" | Question_136 == "Cough" | Question_137 == "Cough" | Question_138 == "Cough" | Question_139 == "Cough" | Question_1310 == "Cough" | Question_1311 == "Cough ", 1, NA))
     asu_qualtrics_data <- asu_qualtrics_data %>% mutate(Question_13_Shortness_of_breath = ifelse(Question_131 == "Shortness of breath or difficulty breathing" | Question_132 == "Shortness of breath or difficulty breathing" | Question_133 == "Shortness of breath or difficulty breathing" | Question_134 == "Shortness of breath or difficulty breathing" | Question_135 == "Shortness of breath or difficulty breathing" | Question_136 == "Shortness of breath or difficulty breathing" | Question_137 == "Shortness of breath or difficulty breathing" | Question_138 == "Shortness of breath or difficulty breathing" | Question_139 == "Shortness of breath or difficulty breathing" | Question_1310 == "Shortness of breath or difficulty breathing" | Question_1311 == "Shortness of breath or difficulty breathing", 1, NA))
@@ -524,7 +525,7 @@ library(stringi)
 
 
 #Step 9: Loading the pen and paper survey
-  asu_pen_paper_data <- read_excel("/Users/jacobmatta/Desktop/asu_pen_paper_data.xlsx")
+  asu_pen_paper_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "ASU_penandpaper_preandpost_merged_March25.xlsx"))
   names(asu_pen_paper_data)
   View(asu_pen_paper_data)
   asu_pen_paper_data$ParticipantID <- toupper(asu_pen_paper_data$ParticipantID)
@@ -537,6 +538,8 @@ library(stringi)
 
 
 #Step 11: Exporting the file to excel
-  write_xlsx(asu_merged, "/Users/jacobmatta/Desktop/asu_merged.xlsx")
+  output_file <- here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged.xlsx")
+
+  write.xlsx(asu_merged, output_file)
 
 

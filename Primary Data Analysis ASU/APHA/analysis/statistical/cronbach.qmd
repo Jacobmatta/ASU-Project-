@@ -1,0 +1,97 @@
+# Determining alpha's Alpha for Vaccine Hesitancy and Vaccine uptake Questions
+
+### Packages
+
+```{r}
+#library 
+library(here)
+library(psych) #has cronach alpha function 
+library(readxl) #for reading in the excel clean data 
+```
+
+### Loading the data
+
+```{r}
+asu_merged <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged.xlsx"))
+```
+
+### Cleaning: Removing all of the special characters * which indicate missing in order to run cronbach's alpha 
+```{r}
+# Replace special characters * with NA in the data frame
+asu_merged[asu_merged == "*" | asu_merged == "NA"] <- NA
+```
+
+### Changing questions from character variables to numerical variables 
+```{r}
+asu_merged <- asu_merged %>%
+  mutate(across(Question_44:Question_78, as.numeric))
+```
+
+
+## Vaccine Hesitancy
+
+### Subsetting Vaccine Hesitancy questions by each vaccine hesitancy barrier
+
+#### Clincial Barriers
+
+```{r}
+#clinical barriers: Question 44 through Question 53
+clincal_barriers <- subset(asu_merged, select = c(Question_44, Question_45, Question_46, Question_47, Question_48, Question_49, Question_50, Question_51, Question_52, Question_53))
+```
+
+#### Access Barriers
+
+```{r}
+#access barriers: Question 54 through Question 57
+access_barriers <- subset(asu_merged, select = c(Question_54, Question_55, Question_56, Question_57))
+```
+
+#### Information Barriers
+
+```{r}
+#Information barriers: Question 58 through Question 61
+information_barriers <- subset(asu_merged, select = c(Question_58, Question_59, Question_60, Question_61))
+```
+
+#### Trust Barriers
+
+```{r}
+#Trust barriers: Question 62 through Question 66
+trust_barriers <- subset(asu_merged, select = c(Question_62, Question_63, Question_64, Question_65, Question_66))
+```
+
+#### Religious Barriers
+
+```{r}
+#Religious barriers: Question 67 through Question 71
+religious_barriers <- subset(asu_merged, select = c(Question_67, Question_68, Question_69, Question_70, Question_70))
+```
+
+## Vaccine Uptake
+
+### Subsetting vaccine uptake questions
+
+```{r}
+#Question 72 through Question 78 
+uptake <- subset(asu_merged, select = c(Question_72, Question_73, Question_74, Question_75, Question_76, Question_77, Question_78))
+```
+
+
+## alpha values for Vaccine Hesitancy barriers
+
+```{r}
+#clinical 
+alpha(clincal_barriers)
+
+#access
+alpha(access_barriers)
+
+#information
+alpha(information_barriers)
+
+#trust
+alpha(trust_barriers)
+
+#religious
+alpha(religious_barriers)
+```
