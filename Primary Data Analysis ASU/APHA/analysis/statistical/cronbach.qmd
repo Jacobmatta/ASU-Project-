@@ -2,11 +2,17 @@
 
 ### Packages
 
+### [ltm](https://www.statology.org/cronbachs-alpha-in-r/)
+
 ```{r}
+install.packages("psych")
+
 #library 
 library(here)
-library(psych) #has cronach alpha function 
+library(psych) #has cronbach alpha function 
 library(readxl) #for reading in the excel clean data 
+library(tidyverse)
+library(ltm) #cronbach alpha 
 ```
 
 ### Loading the data
@@ -15,18 +21,20 @@ library(readxl) #for reading in the excel clean data
 asu_merged <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged.xlsx"))
 ```
 
-### Cleaning: Removing all of the special characters * which indicate missing in order to run cronbach's alpha 
+### Cleaning: Removing all of the special characters \* which indicate missing in order to run cronbach's alpha
+
 ```{r}
 # Replace special characters * with NA in the data frame
 asu_merged[asu_merged == "*" | asu_merged == "NA"] <- NA
 ```
 
-### Changing questions from character variables to numerical variables 
-```{r}
-asu_merged <- asu_merged %>%
-  mutate(across(Question_44:Question_78, as.numeric))
-```
+### Seeing what kind of variables we are working with
 
+```{r}
+str(asu_merged)
+
+#we are working with all character variables 
+```
 
 ## Vaccine Hesitancy
 
@@ -36,7 +44,14 @@ asu_merged <- asu_merged %>%
 
 ```{r}
 #clinical barriers: Question 44 through Question 53
-clincal_barriers <- subset(asu_merged, select = c(Question_44, Question_45, Question_46, Question_47, Question_48, Question_49, Question_50, Question_51, Question_52, Question_53))
+clinical_barriers <- subset(asu_merged, select = c(Question_44, Question_45, Question_46, Question_47, Question_48, Question_49, Question_50, Question_51, Question_52, Question_53))
+
+#converting to numerical variable 
+clinical_barriers <- as.data.frame(apply(clinical_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(clinical_barriers)
+
 ```
 
 #### Access Barriers
@@ -64,7 +79,7 @@ trust_barriers <- subset(asu_merged, select = c(Question_62, Question_63, Questi
 
 ```{r}
 #Religious barriers: Question 67 through Question 71
-religious_barriers <- subset(asu_merged, select = c(Question_67, Question_68, Question_69, Question_70, Question_70))
+religious_barriers <- subset(asu_merged, select = c(Question_67, Question_68, Question_69, Question_70, Question_71))
 ```
 
 ## Vaccine Uptake
@@ -76,12 +91,9 @@ religious_barriers <- subset(asu_merged, select = c(Question_67, Question_68, Qu
 uptake <- subset(asu_merged, select = c(Question_72, Question_73, Question_74, Question_75, Question_76, Question_77, Question_78))
 ```
 
-
 ## alpha values for Vaccine Hesitancy barriers
 
 ```{r}
-#clinical 
-alpha(clincal_barriers)
 
 #access
 alpha(access_barriers)
@@ -92,6 +104,8 @@ alpha(information_barriers)
 #trust
 alpha(trust_barriers)
 
-#religious
-alpha(religious_barriers)
 ```
+
+Results:
+
+All report an alpha \> 0.5 which indicates these questions are all reliable measures

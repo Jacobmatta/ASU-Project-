@@ -1,0 +1,222 @@
+# performing the mcar test for Vaccine Hesitancy questions and Vaccine uptake questions
+
+### Reference for the naniar package can be found [here](https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html)
+
+### Reference for the misty package can be found [here](https://search.r-project.org/CRAN/refmans/misty/html/na.test.html)
+
+### Packages
+
+```{r}
+install.packages("misty")
+#library 
+library(here)
+library(psych) #has cronbach alpha function 
+library(readxl) #for reading in the excel clean data 
+library(tidyverse)
+library(naniar) #mcar_test function 
+library(misty) #na.test function 
+```
+
+### Loading the data
+
+```{r}
+asu_merged <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged.xlsx"))
+```
+
+### Cleaning: Removing all of the special characters \* which indicate missing in order to run cronbach's alpha
+
+```{r}
+# Replace special characters * with NA in the data frame
+asu_merged[asu_merged == "*" | asu_merged == "NA"] <- NA
+```
+
+### Changing questions from character variables to numerical variables
+
+```{r}
+asu_merged <- asu_merged %>%
+  mutate(across(Question_44:Question_78, as.numeric))
+```
+
+## Vaccine Hesitancy
+
+### Subsetting Vaccine Hesitancy questions by each vaccine hesitancy barrier
+
+#### Clinicial Barriers
+
+```{r}
+#clinical barriers: Question 44 through Question 53
+clinical_barriers <- subset(asu_merged, select = c(Question_44, Question_45, Question_46, Question_47, Question_48, Question_49, Question_50, Question_51, Question_52, Question_53))
+
+#converting to numerical variable 
+clinical_barriers <- as.data.frame(apply(clinical_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(clinical_barriers)
+```
+
+#### Access Barriers
+
+```{r}
+#access barriers: Question 54 through Question 57
+access_barriers <- subset(asu_merged, select = c(Question_54, Question_55, Question_56, Question_57))
+
+#converting to numerical variable 
+access_barriers <- as.data.frame(apply(access_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(access_barriers)
+```
+
+#### Information Barriers
+
+```{r}
+#Information barriers: Question 58 through Question 61
+information_barriers <- subset(asu_merged, select = c(Question_58, Question_59, Question_60, Question_61))
+
+#converting to numerical variable 
+information_barriers <- as.data.frame(apply(information_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(information_barriers)
+```
+
+#### Trust Barriers
+
+```{r}
+#Trust barriers: Question 62 through Question 66
+trust_barriers <- subset(asu_merged, select = c(Question_62, Question_63, Question_64, Question_65, Question_66))
+
+#converting to numerical variable 
+trust_barriers <- as.data.frame(apply(trust_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(trust_barriers)
+```
+
+#### Religious Barriers
+
+```{r}
+#Religious barriers: Question 67 through Question 71
+religious_barriers <- subset(asu_merged, select = c(Question_67, Question_68, Question_69, Question_70, Question_71))
+
+#converting to numerical variable 
+religious_barriers <- as.data.frame(apply(religious_barriers, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(religious_barriers)
+```
+
+## Vaccine Uptake
+
+### Subsetting vaccine uptake questions
+
+```{r}
+#Question 72 through Question 78 
+uptake <- subset(asu_merged, select = c(Question_72, Question_73, Question_74, Question_75, Question_76, Question_77, Question_78))
+
+#converting to numerical variable 
+uptake <- as.data.frame(apply(uptake, 2, as.numeric)) 
+
+#check if changing to a numerical variable worked 
+str(uptake)
+```
+
+### Null Hypothesis for Little's Missing Completely at Random Test
+
+```{r}
+# Null = the missing data is missing completely at random 
+```
+
+### MCAR test for clinical_barriers
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(clinical_barriers) 
+na.test(clinical_barriers)
+```
+
+Results:
+
+-   chi square test value: 381.80: measures the degree of discrepancy between the observed missing data pattern and the expected missing data pattern under the assumption of MCAR. So a high value of 381.80 would indicate high discrepancy or difference between the observed data pattern and the expected data pattern.
+
+-   p-value of < 0.05 indicates that the data is not missing completely at random
+
+-   Moving forward: we will have to treat clinical barrier variables either as missing at random or missing not at random
+
+### MCAR test for Access Barriers
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(access_barriers) 
+na.test(access_barriers)
+```
+
+Results:
+
+-   chi square test value: 28.19 is small which indicates not a lot of difference between the observed data pattern and the expected data pattern.
+
+-   p-value > 0.05 so we can fail to reject the null indicating that the access barrier variables can be treated as missing completely at random
+
+-   Moving forward: we can go ahead and run the cronbach test of reliability even though missing is present
+
+### MCAR test for Information Barriers
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(information_barriers) 
+na.test(information_barriers)
+```
+
+Results:
+
+-   chi square test value: 29.07 is small which indicates not a lot of difference between the observed data pattern and the expected data pattern.
+
+-   p-value > 0.05 so we can fail to reject the null indicating that the access barrier variables can be treated as missing completely at random
+
+-   Moving forward: we can go ahead and run the cronbach test of reliability even though missing is present
+
+### MCAR test for Trust Barriers
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(trust_barriers) 
+na.test(trust_barriers)
+```
+
+-   chi square test value: 29.07 is small which indicates not a lot of difference between the observed data pattern and the expected data pattern.
+
+-   p-value = 0.05 so we can fail to reject the null indicating that the access barrier variables can be treated as missing completely at random
+
+-   Moving forward: we can go ahead and run the cronbach test of reliability even though missing is present
+
+### MCAR test for Religious Barriers
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(religious_barriers) 
+na.test(religious_barriers)
+```
+
+Results:
+
+-   chi square test value: 60.21:
+
+-   p-value of < 0.05 indicates that the data is not missing completely at random
+
+-   Moving forward: we will have to treat clinical barrier variables either as missing at random or missing not at random
+
+### MCAR test for vaccine uptake 
+
+```{r}
+#running the MCAR test from two different packages for 
+mcar_test(uptake) 
+na.test(uptake)
+```
+
+Results:
+
+-   chi square test value: 179.80
+
+-   p-value of < 0.05 indicates that the data is not missing completely at random
+
+-   Moving forward: we will have to treat clinical barrier variables either as missing at random or missing not at random
