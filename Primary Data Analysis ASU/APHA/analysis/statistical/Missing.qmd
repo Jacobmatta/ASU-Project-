@@ -10,7 +10,6 @@
 install.packages("misty")
 #library 
 library(here)
-library(psych) #has cronbach alpha function 
 library(readxl) #for reading in the excel clean data 
 library(tidyverse)
 library(naniar) #mcar_test function 
@@ -35,6 +34,11 @@ asu_merged[asu_merged == "*" | asu_merged == "NA"] <- NA
 ```{r}
 asu_merged <- asu_merged %>%
   mutate(across(Question_44:Question_78, as.numeric))
+```
+
+```{r}
+asu_merged <- asu_merged %>%
+  mutate(across(Question_1, as.numeric))
 ```
 
 ## Vaccine Hesitancy

@@ -40,7 +40,7 @@ str(asu_merged)
 
 ### Subsetting Vaccine Hesitancy questions by each vaccine hesitancy barrier
 
-#### Clincial Barriers
+#### Clinical Barriers
 
 ```{r}
 #clinical barriers: Question 44 through Question 53

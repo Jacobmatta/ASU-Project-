@@ -1,0 +1,81 @@
+---
+title: "Quarterly Report for HC_HIT-01, HC_HIT-02 and HC_HIT-03"
+format: docx
+editor: visual
+echo: false
+---
+# Library
+
+```{r}
+library(DescTools)
+library(tidyr)
+library(tidyverse)
+library(here)
+library(pastecs)
+library(naniar)
+library(readxl)
+library(Hmisc)
+library(dplyr)
+library(gtsummary)
+```
+
+# Load data
+
+```{r}
+## Loading 
+data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "April11.rds")
+Jan_March = readRDS(data_location)
+
+```
+
+# Creating a data set that includes data January 1st, 2023 through March 31st, 2023
+
+```{r}
+Jan_March <- Jan_March[!(grepl("^10|^11|^12|^04", Jan_March$Date)), ]
+```
+
+
+## Current project data related to Healthy People 2030 objectives: HC/HIT-01
+
+Question_32: "Did the information provider during the event today check your understanding of the COVID-19 health information provided including information about the?"
+
+```{r}
+#getting a count for our indicator PM #5 HC-HIT 01  
+Q32 = Jan_March$Question_32
+
+#replacing NA values with *
+Q32 = Q32 %>% replace(is.na(.), "*")
+
+Q32_pertable= PercTable(Q32)
+Q32_pertable
+```
+
+## Current project data related to Healthy People 2030 objectives: HC/HIT-02
+
+Question 33: "Were you satisfied with the communication regarding COVID-19 health information including information about the vaccine during the event today?"
+
+```{r}
+#getting a count for our indicator PM #5 HC-HIT 01  
+Q33 = Jan_March$Question_33
+
+#replacing NA values with *
+Q33 = Q33 %>% replace(is.na(.), "*")
+
+Q33_pertable= PercTable(Q33)
+Q33_pertable
+```
+
+## Current project data related to Healthy People 2030 objectives: HC/HIT-03
+
+Question 34: "Were you involved in decisions regarding COVID-19 vaccination decisions made today?"
+
+```{r}
+#getting a count for our indicator PM #5 HC-HIT 01  
+Q34 = Jan_March$Question_34
+
+#replacing NA values with *
+Q34 = Q34 %>% replace(is.na(.), "*")
+
+Q34_pertable= PercTable(Q34)
+Q34_pertable
+```

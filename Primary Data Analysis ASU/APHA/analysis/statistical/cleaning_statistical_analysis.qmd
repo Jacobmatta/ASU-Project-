@@ -1,0 +1,405 @@
+# Cleaning file for the statistical analysis investigating the association between Covid-19 exposure and symptom severity with vaccination status or intent 
+
+## Library 
+```{r}
+library(here)
+library(readxl)
+```
+
+
+## Loading the clean data 
+```{r}
+#importing the file with surveys up until Feb 28th 
+location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged.xlsx")
+
+#naming the rawdata 
+asu_merged = read_excel(location)
+```
+
+
+## Cleaning th exposed questions: changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing 
+```{r}
+asu_merged$Question_2[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_3[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_4[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_5[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_6[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_7[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_8[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_9[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_10[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_11[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_12[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Fever[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Cough[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Shortness_of_breath[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Fatigue[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Muscle_Body_Aches[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Headache[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Loss_of_Taste[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Sore_Throat[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Congestion[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Nausea[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Diarrhea[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Asymptomatic[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_13_Other[asu_merged$Question_1 > 1 ] <- "*"
+asu_merged$Question_14[asu_merged$Question_1 > 1 ] <- "*"
+
+#changing the values to symptoms questions to missing if answered "yes" to being asymptomatic 
+asu_merged$Question_13_Fever[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Cough[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Shortness_of_breath[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Fatigue[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Muscle_Body_Aches[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Headache[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Loss_of_Taste[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Sore_Throat[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Congestion[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Nausea[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+asu_merged$Question_13_Diarrhea[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
+```
+
+
+## Subsetting the survey in order to just contain symptom questions
+```{r}
+exposed <- subset(asu_merged, select = c(Question_1, Question_13_Fever:Question_13_Other, Question_15, Question_27))
+```
+
+## Checking the varibale types 
+```{r}
+str(exposed)
+```
+
+## All Variables are saved as character variables so lets convert them to numeric variables 
+```{r}
+# Converting variables from character variables to numeric variables 
+exposed$Question_1 <- as.numeric(exposed$Question_1)
+exposed$Question_13_Fever <- as.numeric(exposed$Question_13_Fever)
+exposed$Question_13_Cough <- as.numeric(exposed$Question_13_Cough)
+exposed$Question_13_Shortness_of_breath <- as.numeric(exposed$Question_13_Shortness_of_breath)
+exposed$Question_13_Fatigue <- as.numeric(exposed$Question_13_Fatigue)
+exposed$Question_13_Muscle_Body_Aches <- as.numeric(exposed$Question_13_Muscle_Body_Aches)
+exposed$Question_13_Headache <- as.numeric(exposed$Question_13_Headache)
+exposed$Question_13_Loss_of_Taste <- as.numeric(exposed$Question_13_Loss_of_Taste)
+exposed$Question_13_Sore_Throat <- as.numeric(exposed$Question_13_Sore_Throat)
+exposed$Question_13_Congestion <- as.numeric(exposed$Question_13_Congestion)
+exposed$Question_13_Nausea <- as.numeric(exposed$Question_13_Nausea)
+exposed$Question_13_Diarrhea <- as.numeric(exposed$Question_13_Diarrhea)
+exposed$Question_13_Asymptomatic <- as.numeric(exposed$Question_13_Asymptomatic)
+exposed$Question_13_Other <- as.numeric(exposed$Question_13_Other)
+exposed$Question_15 <- as.numeric(exposed$Question_15)
+exposed$Question_27 <- as.numeric(exposed$Question_27)
+```
+
+
+## Removing all participants who answered No, not sure, do not know or left question 1 blank
+```{r}
+# Replace the special character "*" with 0
+exposed[exposed == "*"] <- 0
+
+# Replace all NA values with 0
+exposed[is.na(exposed)] <- 0
+
+#removing observations based on participants who answered no to question 1
+exposed = exposed[exposed$Question_1 != "2", ]
+
+#removing observations based on participants who answered not sure to question 1
+exposed = exposed[exposed$Question_1 != "3", ]
+
+#removing observations based on participants who answered do not know to question 1
+exposed = exposed[exposed$Question_1 != "4", ]
+
+#removing observations based on participants who did not answer question 1 
+exposed = exposed[exposed$Question_1 != "0", ]
+
+```
+Now we have a data set that is 361 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are exposed individuals 
+
+```{r}
+counts = table(exposed$Question_15)
+
+props = counts / length(exposed$Question_15)
+```
+
+## Removing those in the exposed group who have answered missing to question 15 since less than 5% of the exposure group answered missing 
+```{r}
+#removing observations based on participants who did not answer question 1 
+exposed = exposed[exposed$Question_15 != "0", ]
+
+```
+
+## Calculating the scale mean for Question 15 
+```{r}
+sum_question15 = sum(exposed$Question_15)
+
+mean_question15 = sum_question15 / 344
+
+Sd_question_15 = sd(exposed$Question_15)
+```
+
+
+
+## Taking a look at the symptom severity of those exposed to covid-19 after participants who answered missing to question 15 were removed 
+```{r}
+table(exposed$Question_13_Fever)
+table(exposed$Question_13_Cough)
+table(exposed$Question_13_Shortness_of_breath)
+table(exposed$Question_13_Fatigue)
+table(exposed$Question_13_Muscle_Body_Aches)
+table(exposed$Question_13_Headache)
+table(exposed$Question_13_Loss_of_Taste)
+table(exposed$Question_13_Sore_Throat)
+table(exposed$Question_13_Congestion)
+table(exposed$Question_13_Nausea)
+table(exposed$Question_13_Diarrhea)
+table(exposed$Question_13_Asymptomatic)
+table(exposed$Question_13_Other)
+```
+
+Creating a new data frame with just asymptomatic individuals 
+```{r}
+asymptomatic = exposed
+
+#removing anyone that was symptomatic 
+asymptomatic = asymptomatic[asymptomatic$Question_13_Asymptomatic != "0", ]
+
+```
+
+
+## Calculating the scale mean for Question 15 for those assymptomatic individuals 
+```{r}
+sum_question15 = sum(asymptomatic$Question_15)
+
+mean_question15 = sum_question15 / 30
+
+Sd_question_15 = sd(asymptomatic$Question_15)
+```
+
+## Creating a new data set from the exposed individuals who are symptomatic 
+```{r}
+#creating data set
+symptomatic = exposed
+
+#removing asymptomatic individuals 
+symptomatic = subset(symptomatic, select = c(Question_1, Question_13_Fever:Question_13_Diarrhea, Question_13_Other, Question_15, Question_27))
+
+#creating a variable for symptomatic individuals if any of the symptom questions were answered 1 then the symptomatic question should be answered as yes 
+symptomatic = exposed %>%
+  mutate(symptomatic = if_else(rowSums(select(., starts_with("Question_13"))) > 0, "Yes", "No"))
+
+#removing observations based on participants who had no to having symptoms 
+symptomatic = symptomatic[symptomatic$symptomatic != "No", ] 
+```
+
+## Determining the risk score of symptomatic individuals 
+```{r}
+sum_question15 = sum(symptomatic$Question_15)
+
+mean_question15 = sum_question15 / 331
+
+Sd_question_15 = sd(symptomatic$Question_15)
+```
+
+
+## Unexposed group: Subsetting the survey in order to just contain symptom questions
+```{r}
+unexposed <- subset(asu_merged, select = c(Question_1, Question_13_Fever:Question_13_Other, Question_15, Question_27))
+```
+
+ 
+## Checking the varibale types 
+```{r}
+str(unexposed)
+```
+
+## All Variables are saved as character variables so lets convert them to numeric variables 
+```{r}
+# Converting variables from character variables to numeric variables 
+unexposed$Question_1 <- as.numeric(unexposed$Question_1)
+unexposed$Question_13_Fever <- as.numeric(unexposed$Question_13_Fever)
+unexposed$Question_13_Cough <- as.numeric(unexposed$Question_13_Cough)
+unexposed$Question_13_Shortness_of_breath <- as.numeric(unexposed$Question_13_Shortness_of_breath)
+unexposed$Question_13_Fatigue <- as.numeric(unexposed$Question_13_Fatigue)
+unexposed$Question_13_Muscle_Body_Aches <- as.numeric(unexposed$Question_13_Muscle_Body_Aches)
+unexposed$Question_13_Headache <- as.numeric(unexposed$Question_13_Headache)
+unexposed$Question_13_Loss_of_Taste <- as.numeric(unexposed$Question_13_Loss_of_Taste)
+unexposed$Question_13_Sore_Throat <- as.numeric(unexposed$Question_13_Sore_Throat)
+unexposed$Question_13_Congestion <- as.numeric(unexposed$Question_13_Congestion)
+unexposed$Question_13_Nausea <- as.numeric(unexposed$Question_13_Nausea)
+unexposed$Question_13_Diarrhea <- as.numeric(unexposed$Question_13_Diarrhea)
+unexposed$Question_13_Asymptomatic <- as.numeric(unexposed$Question_13_Asymptomatic)
+unexposed$Question_13_Other <- as.numeric(unexposed$Question_13_Other)
+unexposed$Question_15 <- as.numeric(unexposed$Question_15)
+unexposed$Question_27 <- as.numeric(unexposed$Question_27)
+```
+
+
+## Removing all participants who answered No, not sure, do not know or left question 1 blank
+```{r}
+# Replace the special character "*" with 0
+unexposed[unexposed == "*"] <- 0
+
+# Replace all NA values with 0
+unexposed[is.na(unexposed)] <- 0
+
+#removing observations based on participants who answered no to question 1
+unexposed = unexposed[unexposed$Question_1 != "1", ]
+
+#removing observations based on participants who answered not sure to question 1
+unexposed = unexposed[unexposed$Question_1 != "3", ]
+
+#removing observations based on participants who answered do not know to question 1
+unexposed = unexposed[unexposed$Question_1 != "4", ]
+
+#removing observations based on participants who did not answer question 1 
+unexposed = unexposed[unexposed$Question_1 != "0", ]
+
+```
+Now we have a data set that is 361 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are unexposed individuals 
+
+```{r}
+counts2 = table(unexposed$Question_15)
+
+props2 = counts2 / length(unexposed$Question_15)
+```
+
+
+## Removing those in the unexposed group who have answered missing to question 15 since less than 5% of the unexposure group answered missing 
+```{r}
+#removing observations based on participants who did not answer question 1 
+unexposed = unexposed[unexposed$Question_15 != "0", ]
+
+```
+
+
+## Calculating the scale mean for Question 15 
+```{r}
+sum_question15_unexp = sum(unexposed$Question_15)
+
+mean_question15_unexp = sum_question15 / 527
+
+Sd_question_15_unexp = sd(unexposed$Question_15)
+```
+
+
+
+# Creating a data set with just question 1 and question 15 to test the association betweeen exposed and unexposed and percieved risk 
+
+## Loading the clean data 
+```{r}
+#importing the file with survey 
+location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged.xlsx")
+
+#naming the rawdata 
+asu_merged = read_excel(location)
+```
+
+## Subsetting the survey to contain question 1 and question 15
+```{r}
+exposed_unexposed <- subset(asu_merged, select = c(Question_1, Question_15))
+```
+
+## Changing data to numeric data 
+```{r}
+exposed_unexposed$Question_1 <- as.numeric(exposed_unexposed$Question_1)
+exposed_unexposed$Question_15 <- as.numeric(exposed_unexposed$Question_15)
+```
+
+
+## Removing all participants who answered No, not sure, do not know or left question 1 blank
+```{r}
+# Replace the special character "*" with 0
+exposed_unexposed[exposed_unexposed == "*"] <- 0
+
+# Replace all NA values with 0
+exposed_unexposed[is.na(exposed_unexposed)] <- 0
+
+#taking a look at the distribution of both questions 
+table(exposed_unexposed$Question_1)
+table(exposed_unexposed$Question_15)
+
+### removing those who resonded do not know and not sure to question 1 
+#removing observations based on participants who answered not sure to question 1
+exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_1 != "3", ]
+
+#removing observations based on participants who answered do not know to question 1
+exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_1 != "4", ]
+
+#now taking a look at the distribution 
+table(exposed_unexposed$Question_1)
+table(exposed_unexposed$Question_15)
+```
+
+## running the chi square test with missing  
+```{r}
+chisq_test <- chisq.test(table(exposed_unexposed$Question_1, exposed_unexposed$Question_15))
+```
+indicates there is a strong association between the two questions 
+
+## running the chi square test without missing 
+```{r}
+#removing observations based on participants who answered missing to question 1
+exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_1 != "0", ]
+
+#removing observations based on participants who answered missing to question 1
+exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_15 != "0", ]
+
+#now taking a look at the distribution 
+table(exposed_unexposed$Question_1)
+table(exposed_unexposed$Question_15)
+
+chisq_test <- chisq.test(table(exposed_unexposed$Question_1, exposed_unexposed$Question_15))
+
+```
+
+## Creating a new variable for question 15
+```{r}
+# Create a new variable with "not at risk", "neutral", and "at risk" categories
+Risk <- ifelse(exposed_unexposed$Question_15 %in% c(1,2), "not at risk", 
+               ifelse(exposed_unexposed$Question_15 == 3, "neutral", "at risk"))
+exposed_unexposed$Question_15 <- Risk
+```
+
+## making a contigency table between question 1 and question 15 
+```{r}
+freq_table <- table(exposed_unexposed$Question_1, exposed_unexposed$Question_15)
+```
+
+## Calculating the ORs
+```{r}
+exposed_at_risk = (147 / (87 + 110)) / (157 / (101 + 270))
+
+#calculating the confidence interval 
+LL_exposed_at_risk <- exp(log(exposed_at_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
+UL_exposed_at_risk <- exp(log(exposed_at_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+
+#calculating the standard error
+SE = sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+
+
+#running fisher's test on the contingency table 
+contingency_table <- matrix(c(147, 87, 110, 156, 101, 270), nrow = 2, byrow = TRUE)
+fisher.test(contingency_table)
+
+
+LL_exposed_at_risk
+UL_exposed_at_risk
+
+#OR for neutral 
+exposed_neutral = (87 / (147 + 110)) / (101 / (156 + 270))
+
+#calculating the confidence interval
+LL_neutral <- exp(log(exposed_neutral) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
+UL_neutral <- exp(log(exposed_neutral) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+
+LL_neutral
+UL_neutral
+
+exposed_not_risk = (110 / (147 + 87)) / (270 / (156 + 101))
+#calculating the confidence interval
+LL_not_risk <- exp(log(exposed_not_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
+UL_not_risk <- exp(log(exposed_not_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+
+LL_not_risk
+UL_not_risk
+```

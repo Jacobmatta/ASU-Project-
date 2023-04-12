@@ -1,0 +1,241 @@
+---
+title: "Descriptive Analysis of ASU Survey for Quarterly Report 1/1 through 3/31"
+format: docx
+editor: visual
+echo: false
+---
+
+# Library
+
+```{r}
+library(DescTools)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(here)
+library(pastecs)
+library(naniar)
+```
+
+# Load data
+
+```{r}
+## Loading 
+data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "April11.rds")
+Jan_March = readRDS(data_location)
+
+```
+
+# Creating a data set that includes data January 1st, 2023 through March 31st, 2023
+
+```{r}
+Jan_March <- Jan_March[!(grepl("^10|^11|^12|^04", Jan_March$Date)), ]
+```
+
+# subsetting the data 
+```{r}
+my_data_subset <- Jan_March[, c(23:32)]
+```
+
+```{r}
+my_data_subset <- my_data_subset %>%
+  mutate(num_conditions = rowSums(!is.na(select(., starts_with("Conditions")))),
+         response_group = ifelse(is.na(num_conditions), "missing",
+                                 ifelse(num_conditions == 1, "at least one",
+                                        ifelse(num_conditions == 2, "at least two",
+                                               ifelse(num_conditions == 3, "three or more",                                                    ifelse(num_conditions == 0, "zero",
+                                               "three or more"))))))
+```
+
+
+# summarizing the response group variable 
+```{r}
+response_group = my_data_subset$response_group
+
+response_group_pertable= PercTable(response_group)
+response_group_pertable
+```
+
+# break down of those who had covid in household
+## reloading 
+```{r}
+## Loading 
+data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "April11.rds")
+Jan_March = readRDS(data_location)
+
+Jan_March <- Jan_March[!(grepl("^10|^11|^12|^04", Jan_March$Date)), ]
+```
+
+#Selecting only those who answered yes to having covid in the household
+```{r}
+my_data_yes <- subset(Jan_March, Question_1 == "Yes")
+```
+
+# Summary for gender
+
+```{r}
+Gender = my_data_yes$Gender %>% replace(is.na(.), "*")
+
+Gender_pertable= PercTable(Gender)
+Gender_pertable
+
+```
+
+# Summary for race
+
+```{r}
+#changes NA values to missing 
+race = my_data_yes$Race_Ethnicity %>% replace(is.na(.), "*")
+
+race_pertable= PercTable(race)
+race_pertable
+
+```
+
+# Summary for Income
+
+```{r}
+Income = my_data_yes$Income %>% replace(is.na(.), "*")
+
+Income_pertable= PercTable(Income)
+Income_pertable
+
+```
+
+# Summary for age
+
+```{r}
+#changes NA values to missing 
+Age = my_data_yes$Age %>% replace(is.na(.), "*")
+
+Age_pertable= PercTable(Age)
+Age_pertable
+```
+
+# Summary for Question_13: Did your children or your family member experience Fever or chills
+
+```{r}
+Question_13_Fever = my_data_yes$Question_13_Fever %>% replace(is.na(.), "*")
+
+Question_13_Fever_pertable= PercTable(Question_13_Fever)
+Question_13_Fever_pertable
+```
+
+# Summary for Question_13_Cough: Did your children or your family member experience cough
+
+```{r}
+Question_13_Cough = my_data_yes$Question_13_Cough %>% replace(is.na(.), "*")
+
+Question_13_Cough_pertable= PercTable(Question_13_Cough)
+Question_13_Cough_pertable
+```
+
+# Summary for Question_13_Shortness_of_breath: Did your children or your family member experience Shortness_of_breath
+
+```{r}
+Question_13_Shortness_of_breath = my_data_yes$Question_13_Shortness_of_breath %>% replace(is.na(.), "*")
+
+Question_13_Shortness_of_breath_pertable= PercTable(Question_13_Shortness_of_breath)
+Question_13_Shortness_of_breath_pertable
+```
+
+# Summary for Question_13_Fatigue: Did your children or your family member experience Fatigue
+
+```{r}
+Question_13_Fatigue = my_data_yes$Question_13_Fatigue %>% replace(is.na(.), "*")
+
+Question_13_Fatigue_pertable= PercTable(Question_13_Fatigue)
+Question_13_Fatigue_pertable
+
+```
+
+# Summary for Question_13_Muscle_Body_Aches: Did your children or your family member experience \_Muscle_Body_Aches
+
+```{r}
+Question_13_Muscle_Body_Aches = my_data_yes$Question_13_Muscle_Body_Aches %>% replace(is.na(.), "*")
+
+Question_13_Muscle_Body_Aches_pertable= PercTable(Question_13_Muscle_Body_Aches)
+Question_13_Muscle_Body_Aches_pertable
+```
+
+# Summary for Question_13_Headache: Did your children or your family member experience Headache
+
+```{r}
+Question_13_Headache = my_data_yes$Question_13_Headache %>% replace(is.na(.), "*")
+
+Question_13_Headache_pertable= PercTable(Question_13_Headache)
+Question_13_Headache_pertable
+```
+
+# Summary for Question_13_Loss_of_Taste: Did your children or your family member experience Loss_of_Taste
+
+```{r}
+Question_13_Loss_of_Taste = my_data_yes$Question_13_Loss_of_Taste %>% replace(is.na(.), "*")
+
+Question_13_Loss_of_Taste_pertable= PercTable(Question_13_Loss_of_Taste)
+Question_13_Loss_of_Taste_pertable
+```
+
+# Summary for Question_13_Sore_Throat: Did your children or your family member experience Sore_Throat
+
+```{r}
+Question_13_Sore_Throat = my_data_yes$Question_13_Sore_Throat %>% replace(is.na(.), "*")
+
+Question_13_Sore_Throat_pertable= PercTable(Question_13_Sore_Throat)
+Question_13_Sore_Throat_pertable
+```
+
+# Summary for Question_13_Congestion: Did your children or your family member experience Congestion
+
+```{r}
+Question_13_Congestion = my_data_yes$Question_13_Congestion %>% replace(is.na(.), "*")
+
+Question_13_Congestion_pertable= PercTable(Question_13_Congestion)
+Question_13_Congestion_pertable
+```
+
+# Summary for Question_13_Nausea: Did your children or your family member experience Nausea
+
+```{r}
+Question_13_Nausea = my_data_yes$Question_13_Nausea %>% replace(is.na(.), "*")
+
+Question_13_Nausea_pertable= PercTable(Question_13_Nausea)
+Question_13_Nausea_pertable
+```
+
+# Summary for Question_13_Diarrhea: Did your children or your family member experience Diarrhea
+
+```{r}
+Question_13_Diarrhea = my_data_yes$Question_13_Diarrhea %>% replace(is.na(.), "*")
+
+Question_13_Diarrhea_pertable= PercTable(Question_13_Diarrhea)
+Question_13_Diarrhea_pertable
+```
+
+# Summary for Question_13_Asymptomatic: Did your children or your family member experience Asymptomatic
+
+```{r}
+Question_13_Asymptomatic = my_data_yes$Question_13_Asymptomatic %>% replace(is.na(.), "*")
+
+Question_13_Asymptomatic_pertable= PercTable(Question_13_Asymptomatic)
+Question_13_Asymptomatic_pertable
+```
+
+# Summary for Question_13_Other: Did your children or your family member experience other
+
+```{r}
+Question_13_Other = my_data_yes$Question_13_Other %>% replace(is.na(.), "*")
+
+Question_13_Other_pertable= PercTable(Question_13_Other)
+Question_13_Other_pertable
+```
+
+# Summary for Question_14: Describe your symptoms
+
+```{r}
+Question_14 = my_data_yes$Question_14 %>% replace(is.na(.), "*")
+
+Question_14_pertable= PercTable(Question_14)
+Question_14_pertable
+```
+
