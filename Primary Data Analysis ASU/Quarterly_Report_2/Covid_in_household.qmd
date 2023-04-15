@@ -1,5 +1,5 @@
 ---
-title: "Descriptive Analysis of ASU Survey for Quarterly Report 1/1 through 3/31"
+title: "break down of those who had covid in household for Quarterly Report 1/1 through 3/31"
 format: docx
 editor: visual
 echo: false
@@ -32,7 +32,8 @@ Jan_March = readRDS(data_location)
 Jan_March <- Jan_March[!(grepl("^10|^11|^12|^04", Jan_March$Date)), ]
 ```
 
-# subsetting the data 
+# subsetting the data
+
 ```{r}
 my_data_subset <- Jan_March[, c(23:32)]
 ```
@@ -47,8 +48,8 @@ my_data_subset <- my_data_subset %>%
                                                "three or more"))))))
 ```
 
+# summarizing the response group variable
 
-# summarizing the response group variable 
 ```{r}
 response_group = my_data_subset$response_group
 
@@ -57,7 +58,9 @@ response_group_pertable
 ```
 
 # break down of those who had covid in household
-## reloading 
+
+## reloading
+
 ```{r}
 ## Loading 
 data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "April11.rds")
@@ -67,6 +70,7 @@ Jan_March <- Jan_March[!(grepl("^10|^11|^12|^04", Jan_March$Date)), ]
 ```
 
 #Selecting only those who answered yes to having covid in the household
+
 ```{r}
 my_data_yes <- subset(Jan_March, Question_1 == "Yes")
 ```
@@ -110,6 +114,22 @@ Age = my_data_yes$Age %>% replace(is.na(.), "*")
 
 Age_pertable= PercTable(Age)
 Age_pertable
+```
+
+# Summary for education
+```{r}
+Education = my_data_yes$Education %>% replace(is.na(.), "*")
+
+Education_pertable= PercTable(Education)
+Education_pertable
+```
+
+# Summary for Zip code 
+```{r}
+zip = my_data_yes$Zip %>% replace(is.na(.), "*")
+
+zip_pertable= PercTable(zip)
+zip_pertable
 ```
 
 # Summary for Question_13: Did your children or your family member experience Fever or chills
@@ -239,3 +259,27 @@ Question_14_pertable= PercTable(Question_14)
 Question_14_pertable
 ```
 
+# subsetting the data to get the conditions percentages of those who had covid in the housefold
+
+```{r}
+my_data_subset <- my_data_yes[, c(23:32)]
+```
+
+```{r}
+my_data_subset <- my_data_subset %>%
+  mutate(num_conditions = rowSums(!is.na(select(., starts_with("Conditions")))),
+         response_group = ifelse(is.na(num_conditions), "missing",
+                                 ifelse(num_conditions == 1, "at least one",
+                                        ifelse(num_conditions == 2, "at least two",
+                                               ifelse(num_conditions == 3, "three or more",                                                    ifelse(num_conditions == 0, "zero",
+                                               "three or more"))))))
+```
+
+# summarizing the response group variable
+
+```{r}
+response_group = my_data_subset$response_group
+
+response_group_pertable= PercTable(response_group)
+response_group_pertable
+```
