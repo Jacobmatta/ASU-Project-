@@ -4,6 +4,7 @@
 ```{r}
 library(here)
 library(readxl)
+library(dplyr)
 ```
 
 
@@ -132,7 +133,7 @@ exposed = exposed[exposed$Question_15 != "0", ]
 ```{r}
 sum_question15 = sum(exposed$Question_15)
 
-mean_question15 = sum_question15 / 344
+mean_question15 = sum_question15 / 402
 
 Sd_question_15 = sd(exposed$Question_15)
 ```
@@ -195,7 +196,7 @@ symptomatic = symptomatic[symptomatic$symptomatic != "No", ]
 ```{r}
 sum_question15 = sum(symptomatic$Question_15)
 
-mean_question15 = sum_question15 / 331
+mean_question15 = sum_question15 / 402
 
 Sd_question_15 = sd(symptomatic$Question_15)
 ```
@@ -318,8 +319,7 @@ exposed_unexposed[is.na(exposed_unexposed)] <- 0
 table(exposed_unexposed$Question_1)
 table(exposed_unexposed$Question_15)
 
-### removing those who resonded do not know and not sure to question 1 
-#removing observations based on participants who answered not sure to question 1
+### removing those who responded do not know and not sure to question 1 
 exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_1 != "3", ]
 
 #removing observations based on participants who answered do not know to question 1
@@ -367,18 +367,17 @@ freq_table <- table(exposed_unexposed$Question_1, exposed_unexposed$Question_15)
 
 ## Calculating the ORs
 ```{r}
-exposed_at_risk = (147 / (87 + 110)) / (157 / (101 + 270))
+exposed_at_risk_OR = (174 / (97 + 131)) / (208 / (130 + 326))
 
 #calculating the confidence interval 
-LL_exposed_at_risk <- exp(log(exposed_at_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_exposed_at_risk <- exp(log(exposed_at_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+LL_exposed_at_risk <- exp(log(exposed_at_risk) - 1.96 * sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326))
+UL_exposed_at_risk <- exp(log(exposed_at_risk) + 1.96 * sqrt((1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)))
 
 #calculating the standard error
-SE = sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
-
+SE = sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)
 
 #running fisher's test on the contingency table 
-contingency_table <- matrix(c(147, 87, 110, 156, 101, 270), nrow = 2, byrow = TRUE)
+contingency_table <- matrix(c(174, 131, 208, 131, 130, 326), nrow = 2, byrow = TRUE)
 fisher.test(contingency_table)
 
 
@@ -386,19 +385,19 @@ LL_exposed_at_risk
 UL_exposed_at_risk
 
 #OR for neutral 
-exposed_neutral = (87 / (147 + 110)) / (101 / (156 + 270))
+exposed_neutral_OR = (97 / (174 + 131)) / (130 / (208 + 326))
 
 #calculating the confidence interval
-LL_neutral <- exp(log(exposed_neutral) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_neutral <- exp(log(exposed_neutral) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+LL_neutral <- exp(log(exposed_neutral_OR) - 1.96 * sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326))
+UL_neutral <- exp(log(exposed_neutral_OR) + 1.96 * sqrt((1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)))
 
 LL_neutral
 UL_neutral
 
-exposed_not_risk = (110 / (147 + 87)) / (270 / (156 + 101))
+exposed_not_risk_OR = (131 / (147 + 97)) / (326 / (130 + 208))
 #calculating the confidence interval
-LL_not_risk <- exp(log(exposed_not_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_not_risk <- exp(log(exposed_not_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+LL_not_risk <- exp(log(exposed_not_risk_OR) - 1.96 * sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326))
+UL_not_risk <- exp(log(exposed_not_risk_OR) + 1.96 * sqrt((1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)))
 
 LL_not_risk
 UL_not_risk

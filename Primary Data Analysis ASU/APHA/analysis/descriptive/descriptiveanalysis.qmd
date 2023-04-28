@@ -961,9 +961,11 @@ Question_43_pertable= PercTable(Question_43)
 Question_43_pertable
 ```
 
-#--------------------------------------SECTION4---------------------------------------------------#
+#--------------------------------------SECTION4---------------------------------------------------# Vaccine Hesitancy Qustions
 
-# Summary for Question_44: Getting sick from multiple dose of COVID-19 vaccine is of concern
+# Clinical Barriers
+
+## Summary for Question_44: Getting sick from multiple dose of COVID-19 vaccine is of concern
 
 ```{r}
 Question_44 = March25$Question_44 %>% replace(is.na(.), "*")
@@ -1054,6 +1056,8 @@ Question_53_pertable= PercTable(Question_53)
 Question_53_pertable
 ```
 
+# Access Barriers
+
 # Summary for Question_54: I don't know how to get a hold of the COVID-19 vaccine
 
 ```{r}
@@ -1090,6 +1094,8 @@ Question_57_pertable= PercTable(Question_57)
 Question_57_pertable
 ```
 
+# Information Barriers
+
 # Summary for Question_58: : I don't have enough information to decide whether to take COVID-19 vaccine or no
 
 ```{r}
@@ -1125,6 +1131,8 @@ Question_61 = March25$Question_61 %>% replace(is.na(.), "*")
 Question_61_pertable= PercTable(Question_61)
 Question_61_pertable
 ```
+
+# Trust Barriers
 
 # Summary for Question_62: : I don't trust vaccines in general
 
@@ -1170,6 +1178,8 @@ Question_66 = March25$Question_66 %>% replace(is.na(.), "*")
 Question_66_pertable= PercTable(Question_66)
 Question_66_pertable
 ```
+
+# Religious Barriers
 
 # Summary for Question_67: : As long as I am faithful to my God and/or my religion, I am protected from COVID-19, therefore I do not need the COVID-19 vaccine
 

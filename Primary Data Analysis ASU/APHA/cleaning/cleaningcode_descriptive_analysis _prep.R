@@ -13,7 +13,7 @@ library(ggplot2)
 library(DescTools)
 library(here)
 
-#importing the file with surveys up until Feb 28th 
+#importing the file with surveys up until March 25th 
 location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged.xlsx")
 
 #naming the rawdata 
@@ -64,7 +64,7 @@ March25$Question_13_Asymptomatic[March25$Question_1 > 1 ] <- "*"
 March25$Question_13_Other[March25$Question_1 > 1 ] <- "*"
 March25$Question_14[March25$Question_1 > 1 ] <- "*"
 
-#If question 22 (3.1) was reported as No, Not Sure or do not know then question 23 (3.2) should be reported as misssing 
+#If question 22 (3.1) was reported as No, Not Sure or do not know then question 23 (3.2) should be reported as missing 
 March25$Question_23[March25$Question_22 > 1 ] <- "*"
 
 #If question 25 (3.7) was reported as yes then Question 27 (were you vaccinated in the past), Question 28 (Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should all be missing 

@@ -1,0 +1,47 @@
+# Library
+
+```{r}
+library(DescTools)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(here)
+library(pastecs)
+library(naniar)
+```
+
+# Load data
+
+```{r}
+## Loading 
+data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "March25.rds")
+March25 = readRDS(data_location)
+
+```
+
+## Subsetting the survey in order to just contain vaccine hesitancy questions
+
+### Clinical Barriers
+```{r}
+Clinical_Barrier <- subset(March25, select = c(Question_44:Question_53))
+```
+
+### Access Barriers
+```{r}
+Access_Barrier <- subset(March25, select = c(Question_54:Question_57))
+```
+
+### Information Barriers
+```{r}
+Information_Barrier <- subset(March25, select = c(Question_58:Question_61))
+```
+
+### Trust Barriers
+```{r}
+Trust_Barrier <- subset(March25, select = c(Question_62:Question_66))
+```
+
+### Religious Barriers
+```{r}
+Religious_Barrier <- subset(March25, select = c(Question_67:Question_71))
+```
