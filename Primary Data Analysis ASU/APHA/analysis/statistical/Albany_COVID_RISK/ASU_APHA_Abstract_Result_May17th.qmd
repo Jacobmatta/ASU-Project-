@@ -1,19 +1,33 @@
+---
+title: "Albany GA Risk of COVID-19 Result As of May 17th 2023"
+format: docx
+editor: visual
+echo: false
+---
+
 # Cleaning file for the statistical analysis investigating the association between Covid-19 exposure and symptom severity with vaccination status or intent 
+
+## Run Date: May 17th 2023
+
+## Qualtrics download date: May 17th 2023 with 1089 observations 
+
+## Pen & Paper last entry date, download date and observations: 4/08/203, 05/17/2023, 459 observations
 
 ## Library 
 ```{r}
 library(here)
 library(readxl)
+library(tidyverse)
 ```
 
 
 ## Loading the clean data 
 ```{r}
 #importing the file with surveys up until Feb 28th 
-location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "March25.rds")
+location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged-May17_2023.xlsx")
 
 #naming the rawdata 
-asu_merged = readRDS(location)
+asu_merged = read_excel(location)
 ```
 
 
@@ -45,7 +59,7 @@ asu_merged$Question_13_Asymptomatic[asu_merged$Question_1 > 1 ] <- "*"
 asu_merged$Question_13_Other[asu_merged$Question_1 > 1 ] <- "*"
 asu_merged$Question_14[asu_merged$Question_1 > 1 ] <- "*"
 
-#changing the values to symptoms questions to missing if answered "yes" to being asymptomatic 
+#changing the values for symptoms questions to missing if answered "yes" to being asymptomatic 
 asu_merged$Question_13_Fever[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
 asu_merged$Question_13_Cough[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
 asu_merged$Question_13_Shortness_of_breath[asu_merged$Question_13_Asymptomatic == 1 ] <- "*"
@@ -113,7 +127,8 @@ exposed = exposed[exposed$Question_1 != "4", ]
 exposed = exposed[exposed$Question_1 != "0", ]
 
 ```
-Now we have a data set that is 361 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are exposed individuals 
+
+## Now we have a data set that is 496 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are exposed individuals 
 
 ```{r}
 counts = table(exposed$Question_15)
@@ -128,13 +143,19 @@ exposed = exposed[exposed$Question_15 != "0", ]
 
 ```
 
+## After removing missing there are 467 observations 
+
+
 ## Calculating the scale mean for Question 15 
 ```{r}
 sum_question15 = sum(exposed$Question_15)
+sum_question15
 
-mean_question15 = sum_question15 / 344
+mean_question15 = sum_question15 / 467
+mean_question15
 
 Sd_question_15 = sd(exposed$Question_15)
+Sd_question_15
 ```
 
 
@@ -156,23 +177,25 @@ table(exposed$Question_13_Asymptomatic)
 table(exposed$Question_13_Other)
 ```
 
-Creating a new data frame with just asymptomatic individuals 
+## Creating a new dataframe with just asymptomatic individuals 
 ```{r}
 asymptomatic = exposed
 
 #removing anyone that was symptomatic 
 asymptomatic = asymptomatic[asymptomatic$Question_13_Asymptomatic != "0", ]
-
 ```
-
+## Asymptomatic dataframe has 42 observations 
 
 ## Calculating the scale mean for Question 15 for those assymptomatic individuals 
 ```{r}
-sum_question15 = sum(asymptomatic$Question_15)
+sum_question15_asymptomatic = sum(asymptomatic$Question_15)
+sum_question15_asymptomatic
 
-mean_question15 = sum_question15 / 30
+mean_question15_asymptomatic = sum_question15_asymptomatic / 42
+mean_question15_asymptomatic
 
-Sd_question_15 = sd(asymptomatic$Question_15)
+Sd_question_15_asymptomatic = sd(asymptomatic$Question_15)
+Sd_question_15_asymptomatic
 ```
 
 ## Creating a new data set from the exposed individuals who are symptomatic 
@@ -190,14 +213,20 @@ symptomatic = exposed %>%
 #removing observations based on participants who had no to having symptoms 
 symptomatic = symptomatic[symptomatic$symptomatic != "No", ] 
 ```
+## 449 indivdiuals were symptomatic out of the exposed grouo
+
 
 ## Determining the risk score of symptomatic individuals 
 ```{r}
-sum_question15 = sum(symptomatic$Question_15)
+sum_question15_symptomatic = sum(symptomatic$Question_15)
+sum_question15_symptomatic
 
-mean_question15 = sum_question15 / 331
 
-Sd_question_15 = sd(symptomatic$Question_15)
+mean_question15_symptomatic = sum_question15_symptomatic / 449
+mean_question15_symptomatic
+
+Sd_question_15_symptomatic = sd(symptomatic$Question_15)
+Sd_question_15_symptomatic
 ```
 
 
@@ -234,7 +263,7 @@ unexposed$Question_27 <- as.numeric(unexposed$Question_27)
 ```
 
 
-## Removing all participants who answered No, not sure, do not know or left question 1 blank
+## Removing all participants who answered Yes, not sure, do not know or left question 1 blank
 ```{r}
 # Replace the special character "*" with 0
 unexposed[unexposed == "*"] <- 0
@@ -242,7 +271,7 @@ unexposed[unexposed == "*"] <- 0
 # Replace all NA values with 0
 unexposed[is.na(unexposed)] <- 0
 
-#removing observations based on participants who answered no to question 1
+#removing observations based on participants who answered Yes to question 1
 unexposed = unexposed[unexposed$Question_1 != "1", ]
 
 #removing observations based on participants who answered not sure to question 1
@@ -255,12 +284,14 @@ unexposed = unexposed[unexposed$Question_1 != "4", ]
 unexposed = unexposed[unexposed$Question_1 != "0", ]
 
 ```
-Now we have a data set that is 361 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are unexposed individuals 
+Unexposed group has 863 observations 
 
 ```{r}
 counts2 = table(unexposed$Question_15)
+counts2
 
 props2 = counts2 / length(unexposed$Question_15)
+props2
 ```
 
 
@@ -270,15 +301,18 @@ props2 = counts2 / length(unexposed$Question_15)
 unexposed = unexposed[unexposed$Question_15 != "0", ]
 
 ```
-
+Now have 838 observations 
 
 ## Calculating the scale mean for Question 15 
 ```{r}
 sum_question15_unexp = sum(unexposed$Question_15)
+sum_question15_unexp
 
-mean_question15_unexp = sum_question15 / 527
+mean_question15_unexp = sum_question15_unexp / 838
+mean_question15_unexp
 
 Sd_question_15_unexp = sd(unexposed$Question_15)
+Sd_question_15_unexp
 ```
 
 
@@ -288,7 +322,7 @@ Sd_question_15_unexp = sd(unexposed$Question_15)
 ## Loading the clean data 
 ```{r}
 #importing the file with survey 
-location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged.xlsx")
+location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged-May17_2023.xlsx")
 
 #naming the rawdata 
 asu_merged = read_excel(location)
@@ -306,7 +340,7 @@ exposed_unexposed$Question_15 <- as.numeric(exposed_unexposed$Question_15)
 ```
 
 
-## Removing all participants who answered No, not sure, do not know or left question 1 blank
+## 
 ```{r}
 # Replace the special character "*" with 0
 exposed_unexposed[exposed_unexposed == "*"] <- 0
@@ -318,7 +352,6 @@ exposed_unexposed[is.na(exposed_unexposed)] <- 0
 table(exposed_unexposed$Question_1)
 table(exposed_unexposed$Question_15)
 
-### removing those who resonded do not know and not sure to question 1 
 #removing observations based on participants who answered not sure to question 1
 exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_1 != "3", ]
 
@@ -333,6 +366,7 @@ table(exposed_unexposed$Question_15)
 ## running the chi square test with missing  
 ```{r}
 chisq_test <- chisq.test(table(exposed_unexposed$Question_1, exposed_unexposed$Question_15))
+chisq_test
 ```
 indicates there is a strong association between the two questions 
 
@@ -348,7 +382,8 @@ exposed_unexposed = exposed_unexposed[exposed_unexposed$Question_15 != "0", ]
 table(exposed_unexposed$Question_1)
 table(exposed_unexposed$Question_15)
 
-chisq_test <- chisq.test(table(exposed_unexposed$Question_1, exposed_unexposed$Question_15))
+chisq_test2 <- chisq.test(table(exposed_unexposed$Question_1, exposed_unexposed$Question_15))
+chisq_test2
 
 ```
 
@@ -363,42 +398,45 @@ exposed_unexposed$Question_15 <- Risk
 ## making a contigency table between question 1 and question 15 
 ```{r}
 freq_table <- table(exposed_unexposed$Question_1, exposed_unexposed$Question_15)
+freq_table
 ```
 
 ## Calculating the ORs
 ```{r}
-exposed_at_risk = (147 / (87 + 110)) / (157 / (101 + 270))
-
-#calculating the confidence interval 
-LL_exposed_at_risk <- exp(log(exposed_at_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_exposed_at_risk <- exp(log(exposed_at_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+exposed_at_risk_OR = (200 / (114 + 153)) / (279 / (163 + 396))
+exposed_at_risk_OR
 
 #calculating the standard error
-SE = sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+SE = sqrt((1/200 + 1/114 + 1/153 + 1/279 + 1/163 + 1/396))
+SE
 
-
-#running fisher's test on the contingency table 
-contingency_table <- matrix(c(147, 87, 110, 156, 101, 270), nrow = 2, byrow = TRUE)
-fisher.test(contingency_table)
-
-
+#calculating the confidence interval 
+LL_exposed_at_risk <- exp(log(exposed_at_risk_OR) - 1.96*SE)
+UL_exposed_at_risk <- exp(log(exposed_at_risk_OR) + 1.96*SE)
 LL_exposed_at_risk
 UL_exposed_at_risk
 
+#running fisher's test on the contingency table 
+contingency_table <- matrix(c(200, 114, 110, 153, 279, 163, 396), nrow = 2, byrow = TRUE)
+fisher.test(contingency_table)
+
 #OR for neutral 
-exposed_neutral = (87 / (147 + 110)) / (101 / (156 + 270))
+exposed_neutral_OR = (114 / (200 + 153)) / (163 / (279 + 396))
+exposed_neutral_OR
 
 #calculating the confidence interval
-LL_neutral <- exp(log(exposed_neutral) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_neutral <- exp(log(exposed_neutral) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+LL_neutral <- exp(log(exposed_neutral_OR) - 1.96 * SE)
+UL_neutral <- exp(log(exposed_neutral_OR) + 1.96 * SE)
 
 LL_neutral
 UL_neutral
 
-exposed_not_risk = (110 / (147 + 87)) / (270 / (156 + 101))
+#OR for not at risk
+exposed_not_risk = (153 / (200 + 114)) / (396 / (163 + 279))
+exposed_not_risk
 #calculating the confidence interval
-LL_not_risk <- exp(log(exposed_not_risk) - 1.96 * sqrt(1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270))
-UL_not_risk <- exp(log(exposed_not_risk) + 1.96 * sqrt((1/110 + 1/87 + 1/147 + 1/156 + 1/101 + 1/270)))
+LL_not_risk <- exp(log(exposed_not_risk) - 1.96 * SE)
+UL_not_risk <- exp(log(exposed_not_risk) + 1.96 * SE)
 
 LL_not_risk
 UL_not_risk

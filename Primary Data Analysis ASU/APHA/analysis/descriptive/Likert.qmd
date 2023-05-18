@@ -8,6 +8,9 @@ library(tidyverse)
 library(here)
 library(pastecs)
 library(naniar)
+library(likert)
+library(reshape2)
+
 ```
 
 # Load data
@@ -19,29 +22,172 @@ March25 = readRDS(data_location)
 
 ```
 
-## Subsetting the survey in order to just contain vaccine hesitancy questions
+### Barriers 
+```{r}
+Hesitancy_barriers = Clinical_Barrier <- subset(March25, select = c(Question_44:Question_71))
+```
+
+### Recoding to numerical
+```{r}
+#### Recode the Likert responses ####
+likert_recode <- function(x) {
+  as.numeric(case_when(
+    x == "Strongly Agree" ~ 1,
+    x == "Agree" ~ 2,
+    x == "Neutral" ~ 3,
+    x == "Disagree" ~ 4,
+    x == "Strongly Disagree" ~ 5,
+  ))
+}
+
+Hesitancy_barriers_quant <- Hesitancy_barriers %>%
+  mutate_all(likert_recode)
+```
+
+### dropping any rows with missing data
+```{r}
+Hesitancy_barriers <- na.omit(Hesitancy_barriers)
+```
 
 ### Clinical Barriers
 ```{r}
-Clinical_Barrier <- subset(March25, select = c(Question_44:Question_53))
+Clinical_Barrier <- subset(Hesitancy_barriers, select = c(Question_44:Question_53))
+
+table(Clinical_Barrier == "Strongly Agree")
+table(Clinical_Barrier == "Agree")
+table(Clinical_Barrier == "Neutral")
+table(Clinical_Barrier == "Disagree")
+table(Clinical_Barrier == "Strongly Disagree")
+
+Clinical_Barrier2 = data.frame(Strongly_Agree = 776/6570,
+                               Agree = 768/6570,
+                               Neutral = 1848/6570,
+                               Disgree = 1594/6570,
+                               Strongly_Disagree = 1584/6570,
+                               Barrier = "Clinical")
 ```
 
-### Access Barriers
+### Access_Barrier
 ```{r}
-Access_Barrier <- subset(March25, select = c(Question_54:Question_57))
+Access_Barrier <- subset(Hesitancy_barriers, select = c(Question_54:Question_57))
+
+table(Access_Barrier == "Strongly Agree")
+table(Access_Barrier == "Agree")
+table(Access_Barrier == "Neutral")
+table(Access_Barrier == "Disagree")
+table(Access_Barrier == "Strongly Disagree")
+
+Access_Barrier2 = data.frame(Strongly_Agree = 90/2628,
+                               Agree = 111/2628,
+                               Neutral = 488/2628,
+                               Disgree = 812/2628,
+                               Strongly_Disagree = 1127/2628,
+                               Barrier = "Access")
 ```
 
-### Information Barriers
+
+### Information_Barrier
 ```{r}
-Information_Barrier <- subset(March25, select = c(Question_58:Question_61))
+Information_Barrier <- subset(Hesitancy_barriers, select = c(Question_58:Question_61))
+
+table(Information_Barrier == "Strongly Agree")
+table(Information_Barrier == "Agree")
+table(Information_Barrier == "Neutral")
+table(Information_Barrier == "Disagree")
+table(Information_Barrier == "Strongly Disagree")
+
+Information_Barrier2 = data.frame(Strongly_Agree = 53/2628,
+                               Agree = 77/2628,
+                               Neutral = 475/2628,
+                               Disgree = 853/2628,
+                               Strongly_Disagree = 1170/2628,
+                               Barrier = "Information")
 ```
 
 ### Trust Barriers
 ```{r}
-Trust_Barrier <- subset(March25, select = c(Question_62:Question_66))
+Trust_Barrier <- subset(Hesitancy_barriers, select = c(Question_62:Question_66))
+
+table(Trust_Barrier == "Strongly Agree")
+table(Trust_Barrier == "Agree")
+table(Trust_Barrier == "Neutral")
+table(Trust_Barrier == "Disagree")
+table(Trust_Barrier == "Strongly Disagree")
+
+Trust_Barrier2 = data.frame(Strongly_Agree = 103/3285,
+                               Agree = 156/3285,
+                               Neutral = 819/3285,
+                               Disgree = 1036/3285,
+                               Strongly_Disagree = 1171/3285,
+                               Barrier = "Trust")
 ```
+
 
 ### Religious Barriers
 ```{r}
-Religious_Barrier <- subset(March25, select = c(Question_67:Question_71))
+Religious_Barrier <- subset(Hesitancy_barriers, select = c(Question_67:Question_71))
+
+table(Religious_Barrier == "Strongly Agree")
+table(Religious_Barrier == "Agree")
+table(Religious_Barrier == "Neutral")
+table(Religious_Barrier == "Disagree")
+table(Religious_Barrier == "Strongly Disagree")
+
+Religious_Barrier2 = data.frame(Strongly_Agree = 121/3285,
+                               Agree = 109/3285,
+                               Neutral = 815/3285,
+                               Disgree = 985/3285,
+                               Strongly_Disagree = 1255/3285,
+                               Barrier = "Religious")
 ```
+
+### combining barriers
+```{r}
+#combining all data sets 
+combined_barrier = rbind(Clinical_Barrier2, Access_Barrier2, Information_Barrier2, Trust_Barrier2, Religious_Barrier2)
+```
+
+###
+```{r}
+likert(Barrier~., combined_barrier, positive.order=TRUE, as.percent = TRUE,
+           main="At my child's school my child is safe.",
+           xlab="percentage",ylab="School Code")
+```
+
+```{r}
+melt = melt(combined_barrier)
+
+melt$value = melt$value*100
+
+melt
+```
+
+```{r}
+colors <- c("#00FF00", "#FFFF00", "#FFFFFF", "#FFA500", "#FF0000")
+
+g2 = ggplot()+
+  geom_bar(data = melt, aes(x = reorder(Barrier,value), y=value, fill=variable), position="stack", stat="identity")+
+  coord_flip() + 
+  ggtitle("Vaccine Hesitancy Reasons")+
+  ylab("Percentage")+
+  xlab("Barrier")+
+  scale_fill_manual(values = colors, name="Response",labels=c("Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree")) +
+  theme(legend.position="bottom")
+  scale_x_discrete(limits=c("Strongly Agree", "Agree", "Neutral","Disagree","Strongly Disagree"))
+g2
+
+g2 <- g2 + guides(fill = guide_legend(reverse = TRUE))
+g2
+
+```
+
+
+
+
+
+```{r}
+file_path = here("Primary Data Analysis ASU", "APHA","analysis", "descriptive", "Likert.png")
+
+ggsave(file_path, plot = g2, width = 8, height = 6, dpi = 300)
+```
+

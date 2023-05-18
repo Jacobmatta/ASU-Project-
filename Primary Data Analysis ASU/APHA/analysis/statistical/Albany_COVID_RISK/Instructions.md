@@ -1,4 +1,4 @@
-Downloading Qualtrics and Pen & Paper Survey Data and Combining Instructions 
+Reproducing RESULTS for ASU ABSTRACT and MANUSCRIPT
 1. Step 1
   a. Log into Qualtrics using uga email and password*. The link to Qualtrics is below https://ugeorgia.yul1.qualtrics.com/responses/#/surveys/SV_3XmJaYvfq58dWZg
 
@@ -38,15 +38,20 @@ Notes:
 3. Step 3
   a. Rename the 'ASU_penandpaper_preandpost_merged.xlsx' to include the data of download following this template 'ASU_penandpaper_preandpost_merged-MonthDay_Year.xlsx'. For example 'ASU_penandpaper_preandpost_merged-May17_2023.xlsx'
   
-  b. Add the downloaded Qualtrics excel file and the 'ASU_penandpaper_preandpost_merged-MonthDay_Year.xlsx' files to the 'rawdata' folder in this R project 
+  b. Open the ASU-Project in RStudio
+  
+  c. Add the downloaded Qualtrics excel file and the 'ASU_penandpaper_preandpost_merged-MonthDay_Year.xlsx' files to the 'rawdata' folder in this R project 
   
 4. Step 4
   a. Change the code in 'cleaningcode_descriptive_analysis_prep.R' file to match the name of the qualtrics file and pen and paper files that you downloaded. You can do this by selecting the find/replace button which is the magnifying glass symbol boarding the file. Copy and paste the old name of the qualtrics file and replace it with updated name. Do the same for the pen & paper survey
   
-  b. Change the name of the cleans file that is exported at the end of the code to include the date. For example change asu_merged.xlsx to asu_merged-MonthDay_Year.xlsx which would look like this asu_merged-May17_2023.xlsx to reflect the date of when you are conducting the data cleaning.
+  b. Change the name of the cleans file that is exported at the end of the code to include the date. For example change asu_merged.xlsx to asu_merged-MonthDay_Year.xlsx which would look like this 'asu_merged-May17_2023.xlsx' to reflect the date of when you are conducting the data cleaning.
   
-  
-5. Step 5 Descriptive Statistics-When needed
-  a. Run the `cleaningcode_descriptive_analysis.qmd` file to get a doc of the descriptive analysis 
+5. Step 5
 
+  a. In find the 'Albany_COVID_RISK' folder* and select the 'ASU_APHA_Abstract_Result.qmd' file 
+  
+  b. Change file name 'asu_merged-May17_2023.xlsx' to have updated date
+  
+  c. update statistics numbers when calculating OR, CIs, Standard Error and others
 

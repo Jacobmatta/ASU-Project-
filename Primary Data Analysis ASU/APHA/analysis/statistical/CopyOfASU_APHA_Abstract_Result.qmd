@@ -386,18 +386,21 @@ UL_exposed_at_risk
 
 #OR for neutral 
 exposed_neutral_OR = (97 / (174 + 131)) / (130 / (208 + 326))
+exposed_neutral_OR
 
 #calculating the confidence interval
-LL_neutral <- exp(log(exposed_neutral_OR) - 1.96 * sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326))
-UL_neutral <- exp(log(exposed_neutral_OR) + 1.96 * sqrt((1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)))
+LL_neutral <- exp(log(exposed_neutral_OR) - 1.96 * SE)
+UL_neutral <- exp(log(exposed_neutral_OR) + 1.96 * SE)
 
 LL_neutral
 UL_neutral
 
-exposed_not_risk_OR = (131 / (147 + 97)) / (326 / (130 + 208))
+exposed_not_risk_OR = (131 / (97 + 174)) / (326 / (130 + 208))
+exposed_not_risk_OR
+
 #calculating the confidence interval
-LL_not_risk <- exp(log(exposed_not_risk_OR) - 1.96 * sqrt(1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326))
-UL_not_risk <- exp(log(exposed_not_risk_OR) + 1.96 * sqrt((1/174 + 1/97 + 1/131 + 1/208 + 1/130 + 1/326)))
+LL_not_risk <- exp(log(exposed_not_risk_OR) - 1.96 * SE)
+UL_not_risk <- exp(log(exposed_not_risk_OR) + 1.96 * SE)
 
 LL_not_risk
 UL_not_risk

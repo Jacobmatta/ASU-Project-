@@ -12,7 +12,7 @@ library(openxlsx) #for saving excel file
 
 #Step 1: Preparing the data
   ##Loading the Qualtrics Data
-    asu_qualtrics_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "asu_qualtrics_data_march25.xlsx"))
+    asu_qualtrics_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "Health Literacy Survey (full survey)_May 17, 2023_09.11.xlsx"))
     names(asu_qualtrics_data)
     View(asu_qualtrics_data)
   ##Removing unwanted columns and rows
@@ -525,7 +525,7 @@ library(openxlsx) #for saving excel file
 
 
 #Step 9: Loading the pen and paper survey
-  asu_pen_paper_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "ASU_penandpaper_preandpost_merged_March25.xlsx"))
+  asu_pen_paper_data <- read_excel(here("Primary Data Analysis ASU", "APHA", "Data", "rawdata", "ASU_penandpaper_preandpost_merged-May17_2023.xlsx"))
   names(asu_pen_paper_data)
   View(asu_pen_paper_data)
   asu_pen_paper_data$ParticipantID <- toupper(asu_pen_paper_data$ParticipantID)
@@ -538,7 +538,7 @@ library(openxlsx) #for saving excel file
 
 
 #Step 11: Exporting the file to excel
-  output_file <- here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged.xlsx")
+  output_file <- here("Primary Data Analysis ASU", "APHA", "Data", "cleandata", "asu_merged-May17_2023.xlsx")
 
   write.xlsx(asu_merged, output_file)
 
