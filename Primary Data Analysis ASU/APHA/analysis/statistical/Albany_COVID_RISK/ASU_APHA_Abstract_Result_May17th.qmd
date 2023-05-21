@@ -126,7 +126,11 @@ exposed = exposed[exposed$Question_1 != "4", ]
 #removing observations based on participants who did not answer question 1 
 exposed = exposed[exposed$Question_1 != "0", ]
 
+#removing observations based on participants who did not answer question 1 
+exposed = exposed[exposed$Question_1 != "NA", ]
+
 ```
+
 
 ## Now we have a data set that is 496 observations which is all of the participants who had Covid-19 or had a family member who had Covid-19. These are exposed individuals 
 
@@ -286,6 +290,8 @@ unexposed = unexposed[unexposed$Question_1 != "0", ]
 ```
 Unexposed group has 863 observations 
 
+
+
 ```{r}
 counts2 = table(unexposed$Question_15)
 counts2
@@ -293,8 +299,6 @@ counts2
 props2 = counts2 / length(unexposed$Question_15)
 props2
 ```
-
-
 ## Removing those in the unexposed group who have answered missing to question 15 since less than 5% of the unexposure group answered missing 
 ```{r}
 #removing observations based on participants who did not answer question 1 

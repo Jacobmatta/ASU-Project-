@@ -1,0 +1,1 @@
+May17th.rds: survey respondents up until may 17th with character values as answers

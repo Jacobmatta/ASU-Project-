@@ -1,0 +1,1 @@
+`exposed_descriptive-May17.qmd`: to get this file, the code from `descriptiveanalysis.qmd` was copied and renamed. Then `cleaningcode_descriptive_analysis_prep.R` was copied and renamed to `cleaningcode_descriptive_analysis_prep-May17th.R` and that was run to produce `May17th.rds` which converts the data from numberical to characters for easy descriptive analysis 
