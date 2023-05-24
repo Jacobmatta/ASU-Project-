@@ -1,0 +1,11 @@
+May17th$Question_78 <- ifelse(May17th$Question_78 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_78 == 2, "Disagree",
+                                   ifelse(May17th$Question_78 == 3, "Neutral",
+                                          ifelse(May17th$Question_78 == 4, "Agree",
+                                                 ifelse(May17th$Question_78 == 5, "Strongly Agree", NA)))))
+
+Question_78_pertable= PercTable(exposed$Question_78)
+Question_78_pertable
+
+missing_values <- sum(is.na(exposed$Question_78))
+print(missing_values)
