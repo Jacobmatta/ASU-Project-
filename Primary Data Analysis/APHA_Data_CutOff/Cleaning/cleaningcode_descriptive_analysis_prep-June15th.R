@@ -1,0 +1,697 @@
+#cleaning in preparation for descriptive summary of data
+
+#library for code
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(data.table)
+library(stringi)
+library(Hmisc)
+library(ggplot2)
+library(DescTools)
+library(here)
+
+#importing the file with surveys up until May 17th  
+location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged-May17_2023.xlsx")
+
+#naming the rawdata 
+asu_merged = read_excel(location)
+
+
+#removing the space from the Health_Insurance variable name 
+colnames(asu_merged)[which(names(asu_merged) == "Health Insurance")] <- "Health_Insurance"
+
+#coping the data set and identifying it by the date it was merged 
+May17th = asu_merged
+
+
+#changing all values to missing of Number_of_children_1, Number_of_children_2 and Number_of_children_3 when Children was answered "No" (2)
+May17th$Number_children_1[May17th$Children == 2 ] <- "*"
+May17th$Number_children_2[May17th$Children == 2 ] <- "*"
+May17th$Number_children_3[May17th$Children == 2 ] <- "*"
+
+#changing all values to missing of Number_elderly_1, Number_elderly_2 Elderly_family was answered "No" (2)
+May17th$Number_elderly_1[May17th$Elderly_family == 2 ] <- "*"
+May17th$Number_elderly_2[May17th$Elderly_family == 2 ] <- "*"
+
+
+#changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing 
+May17th$Question_2[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_3[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_4[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_5[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_6[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_7[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_8[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_9[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_10[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_11[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_12[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Fever[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Cough[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Shortness_of_breath[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Fatigue[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Muscle_Body_Aches[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Headache[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Loss_of_Taste[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Sore_Throat[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Congestion[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Nausea[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Diarrhea[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Asymptomatic[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_13_Other[May17th$Question_1 > 1 ] <- "*"
+May17th$Question_14[May17th$Question_1 > 1 ] <- "*"
+
+#If question 22 (3.1) was reported as No, Not Sure or do not know then question 23 (3.2) should be reported as missing 
+May17th$Question_23[May17th$Question_22 > 1 ] <- "*"
+
+#If question 25 (3.7) was reported as yes then Question 27 (were you vaccinated in the past), Question 28 (Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should all be missing 
+May17th$Question_27[May17th$Question_25 == 1 ] <- "*"
+May17th$Question_28[May17th$Question_25 == 1 ] <- "*"
+May17th$Question_29[May17th$Question_25 == 1 ] <- "*"
+
+#If question 25 was reported as no then question 26 (was this your first dose) should be reported as missing 
+May17th$Question_26[May17th$Question_25 > 1 ] <- "*"
+
+#if question 27(were you vaccinated in the past) was answered yes then question 28(Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should be missing 
+May17th$Question_28[May17th$Question_27 == 1 ] <- "*"
+May17th$Question_29[May17th$Question_27 == 1 ] <- "*"
+
+#if question 40 (did your child or children also get the vaccine today?) was reported as yes then question 42 (was your child vaccinated in the past) and question 43 (do you plan to get your child vaccinated in the near future) should both be missing 
+May17th$Question_42[May17th$Question_40 == 1 ] <- "*"
+May17th$Question_43[May17th$Question_40 == 1 ] <- "*"
+
+#if question 40 was reported as no or as "I do not have children under 18 in my household" then question 41 (was the dose your child received their first dose)should be missing 
+May17th$Question_41[May17th$Question_40 > 1 ] <- "*"
+
+#if question 42 was reported as yes then question 43 should be missing 
+May17th$Question_43[May17th$Question_42 == 1 ] <- "*"
+
+#changing numeric responses to characters for data summary
+#doing this so we do not have to turn to the code book for interpretation
+
+##Gender
+May17th$Gender <- ifelse(May17th$Gender == 1, "Male", 
+                       ifelse(May17th$Gender == 2, "Female",
+                              ifelse(May17th$Gender == 3, "I would rather not specify", NA)))
+
+##Age
+May17th$Age <- ifelse(May17th$Age == 1, "18-24 years old", 
+                                 ifelse(May17th$Age == 2, "25-34 years old",
+                                        ifelse(May17th$Age == 3, "35-46 years old",
+                                               ifelse(May17th$Age == 4, "45-54 years old",
+                                                      ifelse(May17th$Age == 5, "55-64 years old",
+                                                             ifelse(May17th$Age == 6, "65-74 years old",
+                                                                    ifelse(May17th$Age == 7, "75 years or older", NA)))))))
+##Race_Ethnicity
+May17th$Race_Ethnicity <- ifelse(May17th$Race_Ethnicity == 1, "African American", 
+                                            ifelse(May17th$Race_Ethnicity == 2, "Caucasian",
+                                                   ifelse(May17th$Race_Ethnicity == 3, "Latino or Hispanic",
+                                                          ifelse(May17th$Race_Ethnicity == 4, "Asian",
+                                                                 ifelse(May17th$Race_Ethnicity == 5, "Native American",
+                                                                        ifelse(May17th$Race_Ethnicity == 6, "Other", NA))))))
+
+##Education
+May17th$Education <- ifelse(May17th$Education == 1, "Less than High School", 
+                          ifelse(May17th$Education == 2, "High School",
+                                 ifelse(May17th$Education == 3, "Bachelor's Degree or higher", NA)))
+
+##Language
+May17th$Language <- ifelse(May17th$Language == 1, "English", 
+                         ifelse(May17th$Language == 2, "Spanish",
+                                ifelse(May17th$Language == 3, "Other", NA)))
+##Income
+May17th$Income <- ifelse(May17th$Income == 1, "Less than $25,000", 
+                       ifelse(May17th$Income == 2, "$25,000-$50,000",
+                              ifelse(May17th$Income == 3, "$50,000-$100,000",
+                                     ifelse(May17th$Income == 4, "More than $100,000", NA))))
+
+##Family_household
+May17th$Family_household <- ifelse(May17th$Family_household == 1, 1, 
+                                 ifelse(May17th$Family_household == 2, 2,
+                                        ifelse(May17th$Family_household == 3, 3,
+                                               ifelse(May17th$Family_household == 4, 4,
+                                                      ifelse(May17th$Family_household == 5, "5 or more", NA)))))
+##Children
+May17th$Children <- ifelse(May17th$Children == 1, "Yes", 
+                         ifelse(May17th$Children == 2, "No", NA))
+##Elderly_family
+May17th$Elderly_family <- ifelse(May17th$Elderly_family == 1, "Yes", 
+                               ifelse(May17th$Elderly_family == 2, "No", NA))
+##Health_Insurance
+May17th$Health_Insurance <- ifelse(May17th$Health_Insurance == 1, "Medicaid", 
+                                                ifelse(May17th$Health_Insurance == 2, "Medicare",
+                                                       ifelse(May17th$Health_Insurance == 3, "Affordable Care Act (Obamacare)",
+                                                              ifelse(May17th$Health_Insurance == 4, "Uninsured",
+                                                                     ifelse(May17th$Health_Insurance == 5, "Private Health_Insurance",
+                                                                            ifelse(May17th$Health_Insurance == 6, "Other",
+                                                                                   ifelse(May17th$Health_Insurance == 7, "Don't Know / Not Sure", NA)))))))
+##Conditions_Cancer
+May17th$Conditions_Cancer <- ifelse(May17th$Conditions_Cancer == 1, "Yes", NA)
+
+##Conditions_Severe_Allergies
+May17th$Conditions_Severe_Allergies <- ifelse(May17th$Conditions_Severe_Allergies == 1, "Yes", NA)
+
+##Conditions_Seizures
+May17th$Conditions_Seizures <- ifelse(May17th$Conditions_Seizures == 1, "Yes", NA)
+
+##Conditions_Obesity
+May17th$Conditions_Obesity <- ifelse(May17th$Conditions_Obesity == 1, "Yes", NA)
+
+##Conditions_Cardio_Disease
+May17th$Conditions_Cardio_Disease <- ifelse(May17th$Conditions_Cardio_Disease == 1, "Yes", NA)
+
+##Conditions_Rheumatological
+May17th$Conditions_Rheumatological <- ifelse(May17th$Conditions_Rheumatological == 1, "Yes", NA)
+
+##Conditions_Pulmonary
+May17th$Conditions_Pulmonary <- ifelse(May17th$Conditions_Pulmonary == 1, "Yes", NA)
+
+##Conditions_Diabetes
+May17th$Conditions_Diabetes <- ifelse(May17th$Conditions_Diabetes == 1, "Yes", NA)
+
+##Conditions_Immuno
+May17th$Conditions_Immuno <- ifelse(May17th$Conditions_Immuno == 1, "Yes", NA)
+
+##Conditions_Pregnancy
+May17th$Conditions_Pregnancy <- ifelse(May17th$Conditions_Pregnancy == 1, "Yes", NA)
+
+##Conditions_Other
+May17th$Conditions_Other <- ifelse(May17th$Conditions_Other == 1, "Yes", NA)
+
+##Conditions_No_Conditions
+May17th$Conditions_No_Conditions <- ifelse(May17th$Conditions_No_Conditions == 1, "Yes", NA)
+
+##Question_1
+May17th$Question_1 <- ifelse(May17th$Question_1 == 1, "Yes", 
+                           ifelse(May17th$Question_1 == 2, "No",
+                                  ifelse(May17th$Question_1 == 3, "Not sure",
+                                         ifelse(May17th$Question_1 == 4, "Do not know", NA))))
+##Question_13_Fever
+May17th$Question_13_Fever <- ifelse(May17th$Question_13_Fever == 1, "Yes", NA)
+
+##Question_13_Cough
+May17th$Question_13_Cough <- ifelse(May17th$Question_13_Cough == 1, "Yes", NA)
+
+##Question_13_Shortness_of_breath
+May17th$Question_13_Shortness_of_breath <- 
+  ifelse(May17th$Question_13_Shortness_of_breath == 1, "Yes", NA)
+
+##Question_13_Fatigue
+May17th$Question_13_Fatigue <- 
+  ifelse(May17th$Question_13_Fatigue == 1, "Yes", NA)
+
+##Question_13_Muscle_Body_Aches
+May17th$Question_13_Muscle_Body_Aches <- 
+  ifelse(May17th$Question_13_Muscle_Body_Aches == 1, "Yes", NA)
+
+##Question_13_Headache
+May17th$Question_13_Headache <- 
+  ifelse(May17th$Question_13_Headache == 1, "Yes", NA)
+
+##Question_13_Loss_of_Taste
+May17th$Question_13_Loss_of_Taste <- 
+  ifelse(May17th$Question_13_Loss_of_Taste == 1, "Yes", NA)
+
+##Question_13_Sore_Throat
+May17th$Question_13_Sore_Throat <- 
+  ifelse(May17th$Question_13_Sore_Throat == 1, "Yes", NA)
+
+##Question_13_Congestion
+May17th$Question_13_Congestion <- 
+  ifelse(May17th$Question_13_Congestion == 1, "Yes", NA)
+
+##Question_13_Nausea
+May17th$Question_13_Nausea <- 
+  ifelse(May17th$Question_13_Nausea == 1, "Yes", NA)
+
+##Question_13_Diarrhea
+May17th$Question_13_Diarrhea <- 
+  ifelse(May17th$Question_13_Diarrhea == 1, "Yes", NA)
+
+##Question_13_Asymptomatic
+May17th$Question_13_Asymptomatic <- 
+  ifelse(May17th$Question_13_Asymptomatic == 1, "Yes", NA)
+
+##Question_13_Other
+May17th$Question_13_Other <- 
+  ifelse(May17th$Question_13_Other == 1, "Yes", NA)
+
+##Question_15
+May17th$Question_15 <- ifelse(May17th$Question_15 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_15 == 2, "Disagree",
+                                   ifelse(May17th$Question_15 == 3, "Neutral",
+                                          ifelse(May17th$Question_15 == 4, "Agree",
+                                                 ifelse(May17th$Question_15 == 5, "Strongly Agree", NA)))))
+##Question_16
+May17th$Question_16 <- ifelse(May17th$Question_16 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_16 == 2, "Disagree",
+                                   ifelse(May17th$Question_16 == 3, "Neutral",
+                                          ifelse(May17th$Question_16 == 4, "Agree",
+                                                 ifelse(May17th$Question_16 == 5, "Strongly Agree", NA)))))
+##Question_17
+May17th$Question_17 <- ifelse(May17th$Question_17 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_17 == 2, "Disagree",
+                                   ifelse(May17th$Question_17 == 3, "Neutral",
+                                          ifelse(May17th$Question_17 == 4, "Agree",
+                                                 ifelse(May17th$Question_17 == 5, "Strongly Agree", NA)))))
+##Question_18
+May17th$Question_18 <- ifelse(May17th$Question_18 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_18 == 2, "Disagree",
+                                   ifelse(May17th$Question_18 == 3, "Neutral",
+                                          ifelse(May17th$Question_18 == 4, "Agree",
+                                                 ifelse(May17th$Question_18 == 5, "Strongly Agree", NA)))))
+##Question_19
+May17th$Question_19 <- ifelse(May17th$Question_19 == 1, "Yes", 
+                            ifelse(May17th$Question_19 == 2, "No",
+                                   ifelse(May17th$Question_19 == 3, "Not sure",
+                                          ifelse(May17th$Question_19 == 4, "Do not know", NA))))
+##Question_20_Basic_Health 
+May17th$Question_20_Basic_Health <- 
+  ifelse(May17th$Question_20_Basic_Health == 1, "Yes", NA)
+
+##Question_20_COVID_19_Vacc 
+May17th$Question_20_COVID_19_Vacc <- 
+  ifelse(May17th$Question_20_COVID_19_Vacc == 1, "Yes", NA)
+
+##Question_20_Improving_ventilation 
+May17th$Question_20_Improving_ventilation <- 
+  ifelse(May17th$Question_20_Improving_ventilation == 1, "Yes", NA)
+
+##Question_20_Getting_tested 
+May17th$Question_20_Getting_tested <- 
+  ifelse(May17th$Question_20_Getting_tested == 1, "Yes", NA)
+
+##Question_20_Following_recommendations
+May17th$Question_20_Following_recommendations <- 
+  ifelse(May17th$Question_20_Following_recommendations == 1, "Yes", NA)
+
+##Question_20_Staying_home
+May17th$Question_20_Staying_home <- 
+  ifelse(May17th$Question_20_Staying_home == 1, "Yes", NA)
+
+##Question_20_Seeking
+May17th$Question_20_Seeking <- 
+  ifelse(May17th$Question_20_Seeking == 1, "Yes", NA)
+
+##Question_20_Avoiding
+May17th$Question_20_Avoiding <- 
+  ifelse(May17th$Question_20_Avoiding == 1, "Yes", NA)
+
+##Question_21
+May17th$Question_21 <- ifelse(May17th$Question_21 == 1, "Yes", 
+                            ifelse(May17th$Question_21 == 2, "No",
+                                   ifelse(May17th$Question_21 == 3, "Not sure",
+                                          ifelse(May17th$Question_21 == 4, "Do not know", NA))))
+##Question_22
+May17th$Question_22 <- ifelse(May17th$Question_22 == 1, "Yes", 
+                            ifelse(May17th$Question_22 == 2, "No",
+                                   ifelse(May17th$Question_22 == 3, "Not sure",
+                                          ifelse(May17th$Question_22 == 4, "Do not know", NA))))
+##Question_23
+May17th$Question_23 <- ifelse(May17th$Question_23 == 1, "Yes", 
+                            ifelse(May17th$Question_23 == 2, "No",
+                                   ifelse(May17th$Question_23 == 3, "Not sure",
+                                          ifelse(May17th$Question_23 == 4, "Do not know", NA))))
+##Question_24
+May17th$Question_24 <- ifelse(May17th$Question_24 == 1, "Yes", 
+                            ifelse(May17th$Question_24 == 2, "No",
+                                   ifelse(May17th$Question_24 == 3, "Not sure",
+                                          ifelse(May17th$Question_24 == 4, "Do not know", NA))))
+##Question_25
+May17th$Question_25 <- ifelse(May17th$Question_25 == 1, "Yes", 
+                            ifelse(May17th$Question_25 == 2, "No", NA))
+
+##Question_26
+May17th$Question_26 <- ifelse(May17th$Question_26 == 1, "Yes", 
+                            ifelse(May17th$Question_26 == 2, "No", NA))
+
+##Question_27
+May17th$Question_27 <- ifelse(May17th$Question_27 == 1, "Yes", 
+                            ifelse(May17th$Question_27 == 2, "No", NA))
+
+##Question_28
+May17th$Question_28 <- ifelse(May17th$Question_28 == 1, "Yes", 
+                            ifelse(May17th$Question_28 == 2, "No",
+                                   ifelse(May17th$Question_28 == 3, "Not sure",
+                                          ifelse(May17th$Question_28 == 4, "Do not know", NA))))
+
+##Question_29
+May17th$Question_29 <- ifelse(May17th$Question_29 == 1, "Yes", 
+                            ifelse(May17th$Question_29 == 2, "No", NA))
+
+##Question_30_Physician
+May17th$Question_30_Physician <- 
+  ifelse(May17th$Question_30_Physician == 1, "Yes", NA)
+
+##Question_30_Nurse_Practitioner
+May17th$Question_30_Nurse_Practitioner <- 
+  ifelse(May17th$Question_30_Nurse_Practitioner == 1, "Yes", NA)
+
+##Question_30_Registered_Nurse
+May17th$Question_30_Registered_Nurse <- 
+  ifelse(May17th$Question_30_Registered_Nurse == 1, "Yes", NA)
+
+##Question_30_Community_Health_Advocate
+May17th$Question_30_Community_Health_Advocate <- 
+  ifelse(May17th$Question_30_Community_Health_Advocate == 1, "Yes", NA)
+
+##Question_30_Community_Member
+May17th$Question_30_Community_Member <- 
+  ifelse(May17th$Question_30_Community_Member == 1, "Yes", NA)
+
+##Question_30_Other
+May17th$Question_30_Other <- 
+  ifelse(May17th$Question_30_Other == 1, "Yes", NA)
+
+##Question_32
+May17th$Question_32 <- ifelse(May17th$Question_32 == 1, "Yes", 
+                            ifelse(May17th$Question_32 == 2, "No",
+                                   ifelse(May17th$Question_32 == 3, "Not sure",
+                                          ifelse(May17th$Question_32 == 4, "Do not know", NA))))
+
+##Question_33
+May17th$Question_33 <- ifelse(May17th$Question_33 == 1, "Yes", 
+                            ifelse(May17th$Question_33 == 2, "No",
+                                   ifelse(May17th$Question_33 == 3, "Not sure",
+                                          ifelse(May17th$Question_33 == 4, "Do not know", NA))))
+
+##Question_34
+May17th$Question_34 <- ifelse(May17th$Question_34 == 1, "Yes", 
+                            ifelse(May17th$Question_34 == 2, "No",
+                                   ifelse(May17th$Question_34 == 3, "Not sure",
+                                          ifelse(May17th$Question_34 == 4, "Do not know", NA))))
+
+##Question_35
+May17th$Question_35 <- ifelse(May17th$Question_35 == 1, "Very confident", 
+                            ifelse(May17th$Question_35 == 2, "Moderately confident",
+                                   ifelse(May17th$Question_35 == 3, "Moderately unconfident",
+                                          ifelse(May17th$Question_35 == 4, "Very unconfident", NA))))
+
+##Question_36
+May17th$Question_36 <- ifelse(May17th$Question_36 == 1, "local church", 
+                                         ifelse(May17th$Question_36 == 2, "local hospital",
+                                                ifelse(May17th$Question_36 == 3, "local barbershop",
+                                                       ifelse(May17th$Question_36 == 4, "mobile vaccine and/or testing clinics",
+                                                              ifelse(May17th$Question_36 == 5,  "other community event", NA)))))
+##Question_38_Handout_flier
+May17th$Question_38_Handout_flier <- 
+  ifelse(May17th$Question_38_Handout_flier == 1, "Yes", NA)
+
+##Question_38_Social_media
+May17th$Question_38_Social_media <- 
+  ifelse(May17th$Question_38_Social_media == 1, "Yes", NA)
+
+##Question_38_Standard_media
+May17th$Question_38_Standard_media <- 
+  ifelse(May17th$Question_38_Standard_media == 1, "Yes", NA)
+
+##Question_38_Community_Health_Advocate
+May17th$Question_38_Community_Health_Advocate <- 
+  ifelse(May17th$Question_38_Community_Health_Advocate == 1, "Yes", NA)
+
+##Question_38_Church_service
+May17th$Question_38_Church_service <- 
+  ifelse(May17th$Question_38_Church_service == 1, "Yes", NA)
+
+##Question_38_Barbershop
+May17th$Question_38_Barbershop <- 
+  ifelse(May17th$Question_38_Barbershop == 1, "Yes", NA)
+
+##Question_38_Community_members
+May17th$Question_38_Community_members <- 
+  ifelse(May17th$Question_38_Community_members == 1, "Yes", NA)
+
+##Question_38_Others
+May17th$Question_38_Others <- 
+  ifelse(May17th$Question_38_Others == 1, "Yes", NA)
+
+##Question_40
+May17th$Question_40 <- ifelse(May17th$Question_40 == 1, "Yes", 
+                            ifelse(May17th$Question_40 == 2, "No",
+                                   ifelse(May17th$Question_40 == 3, "I do not have childen under 18 in my household", NA)))
+
+##Question_41
+May17th$Question_41 <- ifelse(May17th$Question_41 == 1, "Yes", 
+                            ifelse(May17th$Question_41 == 2, "No", NA))
+
+##Question_42
+May17th$Question_42 <- ifelse(May17th$Question_42 == 1, "Yes", 
+                            ifelse(May17th$Question_42 == 2, "No", NA))
+
+##Question_43
+May17th$Question_43 <- ifelse(May17th$Question_43 == 1, "Yes", 
+                                         ifelse(May17th$Question_43 == 2, "No",
+                                                ifelse(May17th$Question_43 == 3, "Not sure",
+                                                       ifelse(May17th$Question_43 == 4, "Do not know", NA))))
+##Question_44
+May17th$Question_44 <- ifelse(May17th$Question_44 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_44 == 2, "Disagree",
+                                   ifelse(May17th$Question_44 == 3, "Neutral",
+                                          ifelse(May17th$Question_44 == 4, "Agree",
+                                                 ifelse(May17th$Question_44 == 5, "Strongly Agree", NA)))))
+##Question_45
+May17th$Question_45 <- ifelse(May17th$Question_45 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_45 == 2, "Disagree",
+                                   ifelse(May17th$Question_45 == 3, "Neutral",
+                                          ifelse(May17th$Question_45 == 4, "Agree",
+                                                 ifelse(May17th$Question_45 == 5, "Strongly Agree", NA)))))
+
+##Question_46
+May17th$Question_46 <- ifelse(May17th$Question_46 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_46 == 2, "Disagree",
+                                   ifelse(May17th$Question_46 == 3, "Neutral",
+                                          ifelse(May17th$Question_46 == 4, "Agree",
+                                                 ifelse(May17th$Question_46 == 5, "Strongly Agree", NA)))))
+
+##Question_47
+May17th$Question_47 <- ifelse(May17th$Question_47 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_47 == 2, "Disagree",
+                                   ifelse(May17th$Question_47 == 3, "Neutral",
+                                          ifelse(May17th$Question_47 == 4, "Agree",
+                                                 ifelse(May17th$Question_47 == 5, "Strongly Agree", NA)))))
+
+##Question_48
+May17th$Question_48 <- ifelse(May17th$Question_48 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_48 == 2, "Disagree",
+                                   ifelse(May17th$Question_48 == 3, "Neutral",
+                                          ifelse(May17th$Question_48 == 4, "Agree",
+                                                 ifelse(May17th$Question_48 == 5, "Strongly Agree", NA)))))
+
+##Question_49
+May17th$Question_49 <- ifelse(May17th$Question_49 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_49 == 2, "Disagree",
+                                   ifelse(May17th$Question_49 == 3, "Neutral",
+                                          ifelse(May17th$Question_49 == 4, "Agree",
+                                                 ifelse(May17th$Question_49 == 5, "Strongly Agree", NA)))))
+
+##Question_50
+May17th$Question_50 <- ifelse(May17th$Question_50 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_50 == 2, "Disagree",
+                                   ifelse(May17th$Question_50 == 3, "Neutral",
+                                          ifelse(May17th$Question_50 == 4, "Agree",
+                                                 ifelse(May17th$Question_50 == 5, "Strongly Agree", NA)))))
+
+##Question_51
+May17th$Question_51 <- ifelse(May17th$Question_51 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_51 == 2, "Disagree",
+                                   ifelse(May17th$Question_51 == 3, "Neutral",
+                                          ifelse(May17th$Question_51 == 4, "Agree",
+                                                 ifelse(May17th$Question_51 == 5, "Strongly Agree", NA)))))
+
+##Question_52
+May17th$Question_52 <- ifelse(May17th$Question_52 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_52 == 2, "Disagree",
+                                   ifelse(May17th$Question_52 == 3, "Neutral",
+                                          ifelse(May17th$Question_52 == 4, "Agree",
+                                                 ifelse(May17th$Question_52 == 5, "Strongly Agree", NA)))))
+
+##Question_53
+May17th$Question_53 <- ifelse(May17th$Question_53 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_53 == 2, "Disagree",
+                                   ifelse(May17th$Question_53 == 3, "Neutral",
+                                          ifelse(May17th$Question_53 == 4, "Agree",
+                                                 ifelse(May17th$Question_53 == 5, "Strongly Agree", NA)))))
+
+##Question_54
+May17th$Question_54 <- ifelse(May17th$Question_54 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_54 == 2, "Disagree",
+                                   ifelse(May17th$Question_54 == 3, "Neutral",
+                                          ifelse(May17th$Question_54 == 4, "Agree",
+                                                 ifelse(May17th$Question_54 == 5, "Strongly Agree", NA)))))
+
+##Question_55
+May17th$Question_55 <- ifelse(May17th$Question_55 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_55 == 2, "Disagree",
+                                   ifelse(May17th$Question_55 == 3, "Neutral",
+                                          ifelse(May17th$Question_55 == 4, "Agree",
+                                                 ifelse(May17th$Question_55 == 5, "Strongly Agree", NA)))))
+
+##Question_56
+May17th$Question_56 <- ifelse(May17th$Question_56 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_56 == 2, "Disagree",
+                                   ifelse(May17th$Question_56 == 3, "Neutral",
+                                          ifelse(May17th$Question_56 == 4, "Agree",
+                                                 ifelse(May17th$Question_56 == 5, "Strongly Agree", NA)))))
+
+##Question_57
+May17th$Question_57 <- ifelse(May17th$Question_57 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_57 == 2, "Disagree",
+                                   ifelse(May17th$Question_57 == 3, "Neutral",
+                                          ifelse(May17th$Question_57 == 4, "Agree",
+                                                 ifelse(May17th$Question_57 == 5, "Strongly Agree", NA)))))
+
+##Question_58
+May17th$Question_58 <- ifelse(May17th$Question_58 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_58 == 2, "Disagree",
+                                   ifelse(May17th$Question_58 == 3, "Neutral",
+                                          ifelse(May17th$Question_58 == 4, "Agree",
+                                                 ifelse(May17th$Question_58 == 5, "Strongly Agree", NA)))))
+
+##Question_59
+May17th$Question_59 <- ifelse(May17th$Question_59 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_59 == 2, "Disagree",
+                                   ifelse(May17th$Question_59 == 3, "Neutral",
+                                          ifelse(May17th$Question_59 == 4, "Agree",
+                                                 ifelse(May17th$Question_59 == 5, "Strongly Agree", NA)))))
+
+##Question_60
+May17th$Question_60 <- ifelse(May17th$Question_60 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_60 == 2, "Disagree",
+                                   ifelse(May17th$Question_60 == 3, "Neutral",
+                                          ifelse(May17th$Question_60 == 4, "Agree",
+                                                 ifelse(May17th$Question_60 == 5, "Strongly Agree", NA)))))
+
+##Question_61
+May17th$Question_61 <- ifelse(May17th$Question_61 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_61 == 2, "Disagree",
+                                   ifelse(May17th$Question_61 == 3, "Neutral",
+                                          ifelse(May17th$Question_61 == 4, "Agree",
+                                                 ifelse(May17th$Question_61 == 5, "Strongly Agree", NA)))))
+
+##Question_62
+May17th$Question_62 <- ifelse(May17th$Question_62 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_62 == 2, "Disagree",
+                                   ifelse(May17th$Question_62 == 3, "Neutral",
+                                          ifelse(May17th$Question_62 == 4, "Agree",
+                                                 ifelse(May17th$Question_62 == 5, "Strongly Agree", NA)))))
+
+##Question_63
+May17th$Question_63 <- ifelse(May17th$Question_63 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_63 == 2, "Disagree",
+                                   ifelse(May17th$Question_63 == 3, "Neutral",
+                                          ifelse(May17th$Question_63 == 4, "Agree",
+                                                 ifelse(May17th$Question_63 == 5, "Strongly Agree", NA)))))
+
+##Question_64
+May17th$Question_64 <- ifelse(May17th$Question_64 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_64 == 2, "Disagree",
+                                   ifelse(May17th$Question_64 == 3, "Neutral",
+                                          ifelse(May17th$Question_64 == 4, "Agree",
+                                                 ifelse(May17th$Question_64 == 5, "Strongly Agree", NA)))))
+
+##Question_65
+May17th$Question_65 <- ifelse(May17th$Question_65 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_65 == 2, "Disagree",
+                                   ifelse(May17th$Question_65 == 3, "Neutral",
+                                          ifelse(May17th$Question_65 == 4, "Agree",
+                                                 ifelse(May17th$Question_65 == 5, "Strongly Agree", NA)))))
+
+##Question_66
+May17th$Question_66 <- ifelse(May17th$Question_66 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_66 == 2, "Disagree",
+                                   ifelse(May17th$Question_66 == 3, "Neutral",
+                                          ifelse(May17th$Question_66 == 4, "Agree",
+                                                 ifelse(May17th$Question_66 == 5, "Strongly Agree", NA)))))
+
+##Question_67
+May17th$Question_67 <- ifelse(May17th$Question_67 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_67 == 2, "Disagree",
+                                   ifelse(May17th$Question_67 == 3, "Neutral",
+                                          ifelse(May17th$Question_67 == 4, "Agree",
+                                                 ifelse(May17th$Question_67 == 5, "Strongly Agree", NA)))))
+##Question_68
+May17th$Question_68 <- ifelse(May17th$Question_68 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_68 == 2, "Disagree",
+                                   ifelse(May17th$Question_68 == 3, "Neutral",
+                                          ifelse(May17th$Question_68 == 4, "Agree",
+                                                 ifelse(May17th$Question_68 == 5, "Strongly Agree", NA)))))
+##Question_69
+May17th$Question_69 <- ifelse(May17th$Question_69 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_69 == 2, "Disagree",
+                                   ifelse(May17th$Question_69 == 3, "Neutral",
+                                          ifelse(May17th$Question_69 == 4, "Agree",
+                                                 ifelse(May17th$Question_69 == 5, "Strongly Agree", NA)))))
+
+##Question_70
+May17th$Question_70 <- ifelse(May17th$Question_70 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_70 == 2, "Disagree",
+                                   ifelse(May17th$Question_70 == 3, "Neutral",
+                                          ifelse(May17th$Question_70 == 4, "Agree",
+                                                 ifelse(May17th$Question_70 == 5, "Strongly Agree", NA)))))
+##Question_71
+May17th$Question_71 <- ifelse(May17th$Question_71 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_71 == 2, "Disagree",
+                                   ifelse(May17th$Question_71 == 3, "Neutral",
+                                          ifelse(May17th$Question_71 == 4, "Agree",
+                                                 ifelse(May17th$Question_71 == 5, "Strongly Agree", NA)))))
+
+##Question_72
+May17th$Question_72 <- ifelse(May17th$Question_72 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_72 == 2, "Disagree",
+                                   ifelse(May17th$Question_72 == 3, "Neutral",
+                                          ifelse(May17th$Question_72 == 4, "Agree",
+                                                 ifelse(May17th$Question_72 == 5, "Strongly Agree", NA)))))
+
+##Question_73
+May17th$Question_73 <- ifelse(May17th$Question_73 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_73 == 2, "Disagree",
+                                   ifelse(May17th$Question_73 == 3, "Neutral",
+                                          ifelse(May17th$Question_73 == 4, "Agree",
+                                                 ifelse(May17th$Question_73 == 5, "Strongly Agree", NA)))))
+
+##Question_74
+May17th$Question_74 <- ifelse(May17th$Question_74 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_74 == 2, "Disagree",
+                                   ifelse(May17th$Question_74 == 3, "Neutral",
+                                          ifelse(May17th$Question_74 == 4, "Agree",
+                                                 ifelse(May17th$Question_74 == 5, "Strongly Agree", NA)))))
+
+##Question_75
+May17th$Question_75 <- ifelse(May17th$Question_75 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_75 == 2, "Disagree",
+                                   ifelse(May17th$Question_75 == 3, "Neutral",
+                                          ifelse(May17th$Question_75 == 4, "Agree",
+                                                 ifelse(May17th$Question_75 == 5, "Strongly Agree", NA)))))
+
+##Question_76
+May17th$Question_76 <- ifelse(May17th$Question_76 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_76 == 2, "Disagree",
+                                   ifelse(May17th$Question_76 == 3, "Neutral",
+                                          ifelse(May17th$Question_76 == 4, "Agree",
+                                                 ifelse(May17th$Question_76 == 5, "Strongly Agree", NA)))))
+
+##Question_77
+May17th$Question_77 <- ifelse(May17th$Question_77 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_77 == 2, "Disagree",
+                                   ifelse(May17th$Question_77 == 3, "Neutral",
+                                          ifelse(May17th$Question_77 == 4, "Agree",
+                                                 ifelse(May17th$Question_77 == 5, "Strongly Agree", NA)))))
+
+##Question_78
+May17th$Question_78 <- ifelse(May17th$Question_78 == 1, "Strongly Disagree", 
+                            ifelse(May17th$Question_78 == 2, "Disagree",
+                                   ifelse(May17th$Question_78 == 3, "Neutral",
+                                          ifelse(May17th$Question_78 == 4, "Agree",
+                                                 ifelse(May17th$Question_78 == 5, "Strongly Agree", NA)))))
+
+##data_source
+May17th$data_source <- ifelse(May17th$data_source == 1, "Pen and Paper survey", 
+                            ifelse(May17th$data_source == 2, "Pen and Paper survey",
+                                   ifelse(May17th$data_source == 3, "Qualtrics", NA)))
+
+#saving clean data to cleandata folder
+save_data_location = here("Primary Data Analysis ASU", "APHA","Data", "cleandata", "May17th.rds")
+saveRDS(May17th, file = save_data_location)

@@ -22,89 +22,17 @@ library(tidyverse)
 library(table1)
 ```
 
-# Date: May 23rd 2023
-
-
 # Load data
-
-using the asu_merged-May17 dataframe for this analysis because it holds all variables with numeric values but saved as character variables. This allows you to then convert the character variables to numeric variables, perform quality control, then filter the dataframe to only contain asu_merged participants. I can justify using this procedure because filtering the dataframe as numeric variables prevents additional missing being added to the dataset.
-
 ```{r}
 #importing the file with surveys up until Feb 28th 
-location = here("Primary Data Analysis ASU","APHA", "Data", "cleandata", "asu_merged-May17_2023.xlsx")
+location = here("Primary Data Analysis","APHA_Data_CutOff", "Clean_Data", "asu_merged.xlsx")
 
 #naming the rawdata 
 asu_merged = read_excel(location)
 ```
 
-## Cleaning the asu_merged questions: changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing
-
-```{r}
-#changing all values to missing of Number_of_children_1, Number_of_children_2 and Number_of_children_3 when Children was answered "No" (2)
-asu_merged$Number_children_1[asu_merged$Children == 2 ] <- "*"
-asu_merged$Number_children_2[asu_merged$Children == 2 ] <- "*"
-asu_merged$Number_children_3[asu_merged$Children == 2 ] <- "*"
-
-#changing all values to missing of Number_elderly_1, Number_elderly_2 Elderly_family was answered "No" (2)
-asu_merged$Number_elderly_1[asu_merged$Elderly_family == 2 ] <- "*"
-asu_merged$Number_elderly_2[asu_merged$Elderly_family == 2 ] <- "*"
-
-
-#changing all values that follow question 1(Q2.1) if this question was completed as either: no, not sure or do not know then mark Question 2 - Question 14 as missing 
-asu_merged$Question_2[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_3[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_4[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_5[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_6[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_7[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_8[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_9[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_10[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_11[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_12[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Fever[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Cough[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Shortness_of_breath[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Fatigue[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Muscle_Body_Aches[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Headache[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Loss_of_Taste[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Sore_Throat[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Congestion[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Nausea[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Diarrhea[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Asymptomatic[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_13_Other[asu_merged$Question_1 > 1 ] <- "*"
-asu_merged$Question_14[asu_merged$Question_1 > 1 ] <- "*"
-
-#If question 22 (3.1) was reported as No, Not Sure or do not know then question 23 (3.2) should be reported as missing 
-asu_merged$Question_23[asu_merged$Question_22 > 1 ] <- "*"
-
-#If question 25 (3.7) was reported as yes then Question 27 (were you vaccinated in the past), Question 28 (Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should all be missing 
-asu_merged$Question_27[asu_merged$Question_25 == 1 ] <- "*"
-asu_merged$Question_28[asu_merged$Question_25 == 1 ] <- "*"
-asu_merged$Question_29[asu_merged$Question_25 == 1 ] <- "*"
-
-#If question 25 was reported as no then question 26 (was this your first dose) should be reported as missing 
-asu_merged$Question_26[asu_merged$Question_25 > 1 ] <- "*"
-
-#if question 27(were you vaccinated in the past) was answered yes then question 28(Do you plan to get vaccinated in the near future) and Question 29 (If/When you decide to get vaccinated, do you know where to get a vaccine) should be missing 
-asu_merged$Question_28[asu_merged$Question_27 == 1 ] <- "*"
-asu_merged$Question_29[asu_merged$Question_27 == 1 ] <- "*"
-
-#if question 40 (did your child or children also get the vaccine today?) was reported as yes then question 42 (was your child vaccinated in the past) and question 43 (do you plan to get your child vaccinated in the near future) should both be missing 
-asu_merged$Question_42[asu_merged$Question_40 == 1 ] <- "*"
-asu_merged$Question_43[asu_merged$Question_40 == 1 ] <- "*"
-
-#if question 40 was reported as no or as "I do not have children under 18 in my household" then question 41 (was the dose your child received their first dose)should be missing 
-asu_merged$Question_41[asu_merged$Question_40 > 1 ] <- "*"
-
-#if question 42 was reported as yes then question 43 should be missing 
-asu_merged$Question_43[asu_merged$Question_42 == 1 ] <- "*"
-```
 
 ## Checking the varibale types
-
 ```{r}
 str(asu_merged)
 #converting to numeric data 
@@ -112,13 +40,12 @@ asu_merged = asu_merged %>% mutate_all(as.numeric)
 str(asu_merged)
 ```
 
-# Creating the Exposure variable where 1 = Exposed and 2 = not Exposed to COVID-19 and 3 = participants that left question missing or answered do not know or don't know
-
+# Creating the Exposure variable where 1 = asu_merged and 2 = not asu_merged to COVID-19 and 3 = paricipants that left quesiton missing or answered do not know or don't know
 ```{r}
-# Create a new variable "Risk" with missing values by default
+# Create a new variable "Exposure" with missing values by default
 asu_merged$Exposure <- NA
 
-# Set values of "Risk" based on the values of "Question_1"
+# Set values of "Exposure" based on the values of "Question_1"
 asu_merged$Exposure[asu_merged$Question_1 == 1] <- 1
 asu_merged$Exposure[asu_merged$Question_1 == 2] <- 2
 asu_merged$Exposure[!(asu_merged$Question_1 %in% c(1, 2))] <- 3 
@@ -126,9 +53,7 @@ asu_merged$Exposure[!(asu_merged$Question_1 %in% c(1, 2))] <- 3
 table(asu_merged$Exposure)
 ```
 
-
-# Creating the Risk variable where 1 = Not at risk and 2 = at Risk to COVID-19 and 3 = participants that reported to being neutral 
-
+#At risk Variable
 ```{r}
 # Create a new variable "Risk" with missing values by default
 asu_merged$Risk <- NA
@@ -140,11 +65,231 @@ asu_merged$Risk[asu_merged$Question_15 == 3] <- 2
 asu_merged$Risk[asu_merged$Question_15 == 4] <- 3
 asu_merged$Risk[asu_merged$Question_15 == 5] <- 3
 
-asu_merged$Risk[!(asu_merged$Question_1 %in% c(1:5))] <- 4
-
 table(asu_merged$Risk)
 ```
 
+## Adding and Cleaning variables for easy-to-read descriptive analysis 
+```{r}
+####################################### Question Regarding the number of children that tested positive in household
+asu_merged$N_Children_under5 <- NA
+
+# Set values of "N_Children_1" based on the values of "Number_children_1"
+asu_merged$N_Children_under5[asu_merged$Number_children_1 == 0] <- 0
+asu_merged$N_Children_under5[asu_merged$Number_children_1 == 1] <- 1
+asu_merged$N_Children_under5[asu_merged$Number_children_1 == 2] <- 2
+asu_merged$N_Children_under5[!(asu_merged$Number_children_1 %in% c(1, 2, NA, "*"))] <- "3+"  
+
+table(asu_merged$N_Children_under5)
+
+# Create a new variable "N_Children_2" with missing values by default. This variable based on Number_children_2 asking participants the number of children that are 5-11 in household
+asu_merged$N_Children_5to11 <- NA
+
+# Set values of "N_children_2" based on the values of "Number_children_2"
+asu_merged$N_Children_5to11[asu_merged$Number_children_2 == 0] <- 0
+asu_merged$N_Children_5to11[asu_merged$Number_children_2 == 1] <- 1
+asu_merged$N_Children_5to11[asu_merged$Number_children_2 == 2] <- 2
+asu_merged$N_Children_5to11[!(asu_merged$Number_children_2 %in% c(1, 2, NA, "*"))] <- "3+" 
+
+table(asu_merged$N_Children_5to11)
+
+# Create a new variable "N_Children_3" with missing values by default.  This variable based on Number_children_3 asking participants the number of children that are 12-17 in household
+asu_merged$N_Children_12to17 <- NA
+
+# Set values of "N_children_2" based on the values of "Number_children_3"
+asu_merged$N_Children_12to17[asu_merged$Number_children_3 == 0] <- 0
+asu_merged$N_Children_12to17[asu_merged$Number_children_3 == 1] <- 1
+asu_merged$N_Children_12to17[asu_merged$Number_children_3 == 2] <- 2
+asu_merged$N_Children_12to17[!(asu_merged$Number_children_3 %in% c(1, 2, NA, "*"))] <- "3+"  
+
+table(asu_merged$N_Children_12to17)
+
+####################################### Question Regarding the number of elderly that tested positive in household
+#elderly family members 65-74
+asu_merged$Number_elderly_1b <- NA
+
+# Set values of "N_children_2" based on the values of "Number_children_3"
+asu_merged$Number_elderly_1b[asu_merged$Number_elderly_1 == 0] <- 0
+asu_merged$Number_elderly_1b[asu_merged$Number_elderly_1 == 1] <- 1
+asu_merged$Number_elderly_1b[asu_merged$Number_elderly_1 == 2] <- 2
+asu_merged$Number_elderly_1b[!(asu_merged$Number_elderly_1 %in% c(0:15))] <- NA
+asu_merged$Number_elderly_1b[!(asu_merged$Number_elderly_1 %in% c(1, 2, NA, "*"))] <- "3+"  
+
+table(asu_merged$Number_elderly_1b)
+
+#elderly family members 75+
+asu_merged$Number_elderly_2b <- NA
+
+# Set values of "N_children_2" based on the values of "Number_children_3"
+asu_merged$Number_elderly_2b[asu_merged$Number_elderly_2 == 0] <- 0
+asu_merged$Number_elderly_2b[asu_merged$Number_elderly_2 == 1] <- 1
+asu_merged$Number_elderly_2b[asu_merged$Number_elderly_2 == 2] <- 2
+asu_merged$Number_elderly_2b[!(asu_merged$Number_elderly_2 %in% c(0:15))] <- NA
+asu_merged$Number_elderly_2b[!(asu_merged$Number_elderly_2 %in% c(1, 2, NA, "*"))] <- "3+"  
+
+table(asu_merged$Number_elderly_1b)
+
+####################################### Question 3-12 are the questions asking the age of family member with COVID-19 and How many months since infection
+
+# Create a new variable "Question_3b" with missing values by default. 
+asu_merged$Question_3b <- asu_merged$Question_3
+
+# Set values of "Question_3" based on the values of "Number_children_3"
+asu_merged$Question_3b[!(asu_merged$Question_3 %in% c(1:110))] <- NA
+
+table(asu_merged$Question_3b)
+
+# Create a new variable "Question_4b"
+asu_merged$Question_4b <- asu_merged$Question_4 
+
+# Set values of "Question_4b": changing years to months and anything outside 38 months will be dropped
+asu_merged$Question_4b[asu_merged$Question_4 == 2020] <- 36
+asu_merged$Question_4b[asu_merged$Question_4 == 2021] <- 24
+asu_merged$Question_4b[asu_merged$Question_4 == 2022] <- 12
+asu_merged$Question_4b[!(asu_merged$Question_4 %in% c(0:38))] <- NA
+
+table(asu_merged$Question_4b)
+
+# Create a new variable "Question_5b"
+asu_merged$Question_5b <- asu_merged$Question_5
+
+# Set values of "Question_5b" based on the values of "Question_5"
+asu_merged$Question_5b[!(asu_merged$Question_5 %in% c(1:110))] <- NA
+
+table(asu_merged$Question_5b)
+
+# Create a new variable "Question_6b". 
+asu_merged$Question_6b <- asu_merged$Question_6 
+
+# Set values of "Question_6b", changing years to months and anything outside 38 months will be dropped
+asu_merged$Question_6b[asu_merged$Question_6 == 2020] <- 36
+asu_merged$Question_6b[asu_merged$Question_6 == 2021] <- 24
+asu_merged$Question_6b[asu_merged$Question_6 == 2022] <- 12
+asu_merged$Question_6b[!(asu_merged$Question_6 %in% c(0:38))] <- NA
+
+table(asu_merged$Question_6b)
+
+# Create a new variable "Question_7b" 
+asu_merged$Question_7b <- asu_merged$Question_7
+
+# Set values of "Question_7b" based on the values of "Question_5"
+asu_merged$Question_7b[!(asu_merged$Question_7 %in% c(1:110))] <- NA
+
+table(asu_merged$Question_7b)
+
+# Create a new variable "Question_6b". 
+asu_merged$Question_8b <- asu_merged$Question_8 
+
+# Set values of "Question_6b", changing years to months and anything outside 38 months will be dropped
+asu_merged$Question_8b[asu_merged$Question_8 == 2020] <- 36
+asu_merged$Question_8b[asu_merged$Question_8 == 2021] <- 24
+asu_merged$Question_8b[asu_merged$Question_8 == 2022] <- 12
+asu_merged$Question_8b[!(asu_merged$Question_8 %in% c(0:38))] <- NA
+
+table(asu_merged$Question_8b)
+
+# Create a new variable "Question_9b" 
+asu_merged$Question_9b <- asu_merged$Question_9
+
+# Set values of "Question_9b" based on the values of "Question_9"
+asu_merged$Question_9b[!(asu_merged$Question_9 %in% c(1:110))] <- NA
+
+table(asu_merged$Question_9b)
+
+# Create a new variable "Question_10b". 
+asu_merged$Question_10b <- asu_merged$Question_10 
+
+# Set values of "Question_10b", changing years to months and anything outside 38 months will be dropped
+asu_merged$Question_10b[asu_merged$Question_10 == 2020] <- 36
+asu_merged$Question_10b[asu_merged$Question_10 == 2021] <- 24
+asu_merged$Question_10b[asu_merged$Question_10 == 2022] <- 12
+asu_merged$Question_10b[!(asu_merged$Question_10 %in% c(0:38))] <- NA
+
+table(asu_merged$Question_10b)
+
+# Create a new variable "Question_11b" 
+asu_merged$Question_11b <- asu_merged$Question_11
+
+# Set values of "Question_11b" based on the values of "Question_9"
+asu_merged$Question_11b[!(asu_merged$Question_11 %in% c(1:110))] <- NA
+
+table(asu_merged$Question_11b)
+
+# Create a new variable "Question_10b". 
+asu_merged$Question_12b <- asu_merged$Question_12
+
+# Set values of "Question_10b", changing years to months and anything outside 38 months will be dropped
+asu_merged$Question_12b[asu_merged$Question_12 == 2020] <- 36
+asu_merged$Question_12b[asu_merged$Question_12 == 2021] <- 24
+asu_merged$Question_12b[asu_merged$Question_12 == 2022] <- 12
+asu_merged$Question_12b[!(asu_merged$Question_12 %in% c(0:38))] <- NA
+
+table(asu_merged$Question_12b)
+
+####################################### Creating a conditions variable that has values for those with 1,2 and 3+ of the listed conditions including the category "other" 
+
+#replacing NA values for 0
+asu_merged$Conditions_Cancer[is.na(asu_merged$Conditions_Cancer)] <- 0
+asu_merged$Conditions_Severe_Allergies[is.na(asu_merged$Conditions_Severe_Allergies)] <- 0
+asu_merged$Conditions_Seizures[is.na(asu_merged$Conditions_Seizures)] <- 0
+asu_merged$Conditions_Obesity[is.na(asu_merged$Conditions_Obesity)] <- 0
+asu_merged$Conditions_Cardio_Disease[is.na(asu_merged$Conditions_Cardio_Disease)] <- 0
+asu_merged$Conditions_Rheumatological[is.na(asu_merged$Conditions_Rheumatological)] <- 0
+asu_merged$Conditions_Pulmonary[is.na(asu_merged$Conditions_Pulmonary)] <- 0
+asu_merged$Conditions_Diabetes[is.na(asu_merged$Conditions_Diabetes)] <- 0
+asu_merged$Conditions_Immuno[is.na(asu_merged$Conditions_Immuno)] <- 0
+asu_merged$Conditions_Pregnancy[is.na(asu_merged$Conditions_Pregnancy)] <- 0
+asu_merged$Conditions_Other[is.na(asu_merged$Conditions_Other)] <- 0
+asu_merged$Conditions_No_Conditions[is.na(asu_merged$Conditions_Other)] <- 0
+
+asu_merged$N_Conditions <- rowSums(asu_merged[, c("Conditions_Cancer", "Conditions_Severe_Allergies", "Conditions_Seizures", "Conditions_Obesity", "Conditions_Cardio_Disease", "Conditions_Rheumatological", "Conditions_Pulmonary", "Conditions_Diabetes", "Conditions_Immuno", "Conditions_Pregnancy", "Conditions_Other")])
+
+#Seeing if it worked
+table(asu_merged$N_Conditions)
+
+#creating a more discrete variable for conditions
+asu_merged$N_Conditions_b <- asu_merged$N_Conditions
+
+asu_merged$N_Conditions_b[asu_merged$N_Conditions == 1] <- "One Conditions"
+asu_merged$N_Conditions_b[asu_merged$N_Conditions == 2] <- "Two Conditions"
+asu_merged$N_Conditions_b[!(asu_merged$N_Conditions %in% c(1, 2, 0, "*"))] <- "3+ Conditions"
+
+####################################### At risk questions 
+# Create a new variable "Question_16b" with missing values by default
+asu_merged$Question_16b <- NA
+
+# Set values of "Risk" based on the values of "Question_1"
+asu_merged$Question_16b[asu_merged$Question_16 == 1] <- "Not At Risk"
+asu_merged$Question_16b[asu_merged$Question_16 == 2] <- "Not At Risk"
+asu_merged$Question_16b[asu_merged$Question_16 == 3] <- "Neutral"
+asu_merged$Question_16b[asu_merged$Question_16 == 4] <- "At Risk"
+asu_merged$Question_16b[asu_merged$Question_16 == 5] <- "At Risk"
+
+table(asu_merged$Question_16b)
+
+# Create a new variable "Question_17b" with missing values by default
+asu_merged$Question_17b <- NA
+
+# Set values of "Risk" based on the values of "Question_1"
+asu_merged$Question_17b[asu_merged$Question_17 == 1] <- "Not At Risk"
+asu_merged$Question_17b[asu_merged$Question_17 == 2] <- "Not At Risk"
+asu_merged$Question_17b[asu_merged$Question_17 == 3] <- "Neutral"
+asu_merged$Question_17b[asu_merged$Question_17 == 4] <- "At Risk"
+asu_merged$Question_17b[asu_merged$Question_17 == 5] <- "At Risk"
+
+table(asu_merged$Question_17b)
+
+# Create a new variable "Question_18b" with missing values by default
+asu_merged$Question_18b <- NA
+
+# Set values of "Risk" based on the values of "Question_1"
+asu_merged$Question_18b[asu_merged$Question_18 == 1] <- "Not At Risk"
+asu_merged$Question_18b[asu_merged$Question_18 == 2] <- "Not At Risk"
+asu_merged$Question_18b[asu_merged$Question_18 == 3] <- "Neutral"
+asu_merged$Question_18b[asu_merged$Question_18 == 4] <- "At Risk"
+asu_merged$Question_18b[asu_merged$Question_18 == 5] <- "At Risk"
+
+table(asu_merged$Question_18b)
+```
 #--------------------------------------DEMOGRAPHICS---------------------------------------------------#
 
 # Summary for zip
@@ -152,21 +297,21 @@ table(asu_merged$Risk)
 ```{r}
 asu_merged$Zip[!(asu_merged$Zip %in% c(31701, 31705, 31707))] <- "Other" 
 
-PercTable(Zip ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Zip)
 ```
 
 # Summary for gender
 
 ```{r}
-asu_merged$Risk <- ifelse(asu_merged$Risk == 1, "Exposed", 
-                       ifelse(asu_merged$Risk == 2, "Unexposed",
-                              ifelse(asu_merged$Risk == 3, "Missing", NA)))
+asu_merged$Exposure <- ifelse(asu_merged$Exposure == 1, "Exposed", 
+                       ifelse(asu_merged$Exposure == 2, "Unexposed",
+                              ifelse(asu_merged$Exposure == 3, "Missing", NA)))
 
 asu_merged$Gender <- ifelse(asu_merged$Gender == 1, "Male", 
                        ifelse(asu_merged$Gender == 2, "Female",
                               ifelse(asu_merged$Gender == 3, "I would rather not specify", NA)))
 
-PercTable(Gender ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Gender)
 ```
 
 # Summary for age
@@ -175,14 +320,14 @@ PercTable(Gender ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 ##Age
 asu_merged$Age <- ifelse(asu_merged$Age == 1, "18-24 years old", 
                                  ifelse(asu_merged$Age == 2, "25-34 years old",
-                                        ifelse(asu_merged$Age == 3, "35-46 years old",
+                                        ifelse(asu_merged$Age == 3, "35-44 years old",
                                                ifelse(asu_merged$Age == 4, "45-54 years old",
                                                       ifelse(asu_merged$Age == 5, "55-64 years old",
                                                              ifelse(asu_merged$Age == 6, "65-74 years old",
                                                                     ifelse(asu_merged$Age == 7, "75 years or older", NA)))))))
 
 
-PercTable(Age ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Age)
 ```
 
 # Summary for race
@@ -196,7 +341,7 @@ asu_merged$Race_Ethnicity <- ifelse(asu_merged$Race_Ethnicity == 1, "African Ame
                                                                  ifelse(asu_merged$Race_Ethnicity == 5, "Native American",
                                                                         ifelse(asu_merged$Race_Ethnicity == 6, "Other", NA))))))
 
-PercTable(Race_Ethnicity ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Race_Ethnicity)
 ```
 
 # Summary for Education
@@ -207,7 +352,7 @@ asu_merged$Education <- ifelse(asu_merged$Education == 1, "Less than High School
                           ifelse(asu_merged$Education == 2, "High School",
                                  ifelse(asu_merged$Education == 3, "Bachelor's Degree or higher", NA)))
 
-PercTable(Education ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Education)
 ```
 
 # Summary for Language
@@ -218,7 +363,7 @@ asu_merged$Language <- ifelse(asu_merged$Language == 1, "English",
                          ifelse(asu_merged$Language == 2, "Spanish",
                                 ifelse(asu_merged$Language == 3, "Other", NA)))
 
-PercTable(Language ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Language)
 ```
 
 # Summary for Income
@@ -230,7 +375,7 @@ asu_merged$Income <- ifelse(asu_merged$Income == 1, "Less than $25,000",
                               ifelse(asu_merged$Income == 3, "$50,000-$100,000",
                                      ifelse(asu_merged$Income == 4, "More than $100,000", NA))))
 
-PercTable(Income ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Income)
 ```
 
 # Summary for Family_household
@@ -243,7 +388,7 @@ asu_merged$Family_household <- ifelse(asu_merged$Family_household == 1, 1,
                                                ifelse(asu_merged$Family_household == 4, 4,
                                                       ifelse(asu_merged$Family_household == 5, "5 or more", NA)))))
 
-PercTable(Family_household ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Family_household)
 ```
 
 # Summary for Children
@@ -253,43 +398,43 @@ PercTable(Family_household ~ Risk, data = asu_merged, rfrq = "111", margins = c(
 asu_merged$Children <- ifelse(asu_merged$Children == 1, "Yes", 
                          ifelse(asu_merged$Children == 2, "No", NA))
 
-PercTable(Children ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Children)
 ```
 
 # Summary for number of children below 5 years old
 
 ```{r}
-PercTable(Number_children_1 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$N_Children_under5)
 ```
 
 # Summary for number of children between 5-11
 
 ```{r}
-PercTable(Number_children_2 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$N_Children_5to11)
 ```
 
 # Summary for number of children between 12-17
 
 ```{r}
-PercTable(Number_children_3 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$N_Children_12to17)
 ```
 
 # Summary for elderly family members
 
 ```{r}
-PercTable(Elderly_family ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Elderly_family)
 ```
 
 # Summary for the number of elderly family members aged 65-74
 
 ```{r}
-PercTable(Number_elderly_1 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Number_elderly_1b)
 ```
 
 # Summary for the number of elderly family members aged 75+
 
 ```{r}
-PercTable(Number_elderly_2 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Number_elderly_2b)
 ```
 
 # Summary for health insurance
@@ -304,7 +449,7 @@ asu_merged$`Health Insurance` <- ifelse(asu_merged$`Health Insurance` == 1, "Med
                                                                             ifelse(asu_merged$`Health Insurance` == 6, "Other",
                                                                                    ifelse(asu_merged$`Health Insurance` == 7, "Don't Know / Not Sure", NA)))))))
 
-PercTable(`Health Insurance` ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$`Health Insurance`)
 ```
 
 # Summary for participants with cancer
@@ -313,7 +458,7 @@ PercTable(`Health Insurance` ~ Risk, data = asu_merged, rfrq = "111", margins = 
 ##Conditions_Cancer
 asu_merged$Conditions_Cancer <- ifelse(asu_merged$Conditions_Cancer == 1, "Yes", NA)
 
-PercTable(Conditions_Cancer ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Cancer)
 ```
 
 # Summary for participants with severe allergies
@@ -321,7 +466,7 @@ PercTable(Conditions_Cancer ~ Risk, data = asu_merged, rfrq = "111", margins = c
 ```{r}
 asu_merged$Conditions_Severe_Allergies <- ifelse(asu_merged$Conditions_Severe_Allergies == 1, "Yes", NA)
 
-PercTable(Conditions_Severe_Allergies ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Severe_Allergies)
 ```
 
 # Summary for participants with seizures
@@ -329,7 +474,7 @@ PercTable(Conditions_Severe_Allergies ~ Risk, data = asu_merged, rfrq = "111", m
 ```{r}
 asu_merged$Conditions_Seizures <- ifelse(asu_merged$Conditions_Seizures == 1, "Yes", NA)
 
-PercTable(Conditions_Seizures ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Seizures)
 ```
 
 # Summary for participants with obesity
@@ -337,7 +482,7 @@ PercTable(Conditions_Seizures ~ Risk, data = asu_merged, rfrq = "111", margins =
 ```{r}
 asu_merged$Conditions_Obesity <- ifelse(asu_merged$Conditions_Obesity == 1, "Yes", NA)
 
-PercTable(Conditions_Obesity ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Obesity)
 ```
 
 # Summary for participants with cardiovascular disease
@@ -345,7 +490,7 @@ PercTable(Conditions_Obesity ~ Risk, data = asu_merged, rfrq = "111", margins = 
 ```{r}
 asu_merged$Conditions_Cardio_Disease <- ifelse(asu_merged$Conditions_Cardio_Disease == 1, "Yes", NA)
 
-PercTable(Conditions_Cardio_Disease ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Cardio_Disease)
 ```
 
 # Summary for participants with Rheumatological
@@ -353,7 +498,7 @@ PercTable(Conditions_Cardio_Disease ~ Risk, data = asu_merged, rfrq = "111", mar
 ```{r}
 asu_merged$Conditions_Rheumatological <- ifelse(asu_merged$Conditions_Rheumatological == 1, "Yes", NA)
 
-PercTable(Conditions_Rheumatological ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Rheumatological)
 ```
 
 # Summary for participants with pulmonary disease
@@ -361,7 +506,7 @@ PercTable(Conditions_Rheumatological ~ Risk, data = asu_merged, rfrq = "111", ma
 ```{r}
 asu_merged$Conditions_Pulmonary <- ifelse(asu_merged$Conditions_Pulmonary == 1, "Yes", NA)
 
-PercTable(Conditions_Pulmonary ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Pulmonary)
 ```
 
 # Summary for participants with diabetes
@@ -369,7 +514,7 @@ PercTable(Conditions_Pulmonary ~ Risk, data = asu_merged, rfrq = "111", margins 
 ```{r}
 asu_merged$Conditions_Diabetes <- ifelse(asu_merged$Conditions_Diabetes == 1, "Yes", NA)
 
-PercTable(Conditions_Diabetes ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Diabetes)
 ```
 
 # Summary for participants who are in an immunocompromised state
@@ -377,7 +522,7 @@ PercTable(Conditions_Diabetes ~ Risk, data = asu_merged, rfrq = "111", margins =
 ```{r}
 asu_merged$Conditions_Immuno <- ifelse(asu_merged$Conditions_Immuno == 1, "Yes", NA)
 
-PercTable(Conditions_Immuno ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Immuno)
 ```
 
 # Summary for participants who are pregnant
@@ -385,7 +530,7 @@ PercTable(Conditions_Immuno ~ Risk, data = asu_merged, rfrq = "111", margins = c
 ```{r}
 asu_merged$Conditions_Pregnancy <- ifelse(asu_merged$Conditions_Pregnancy == 1, "Yes", NA)
 
-PercTable(Conditions_Pregnancy ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Pregnancy)
 ```
 
 # Summary for participants who are other
@@ -393,7 +538,7 @@ PercTable(Conditions_Pregnancy ~ Risk, data = asu_merged, rfrq = "111", margins 
 ```{r}
 asu_merged$Conditions_Other <- ifelse(asu_merged$Conditions_Other == 1, "Yes", NA)
 
-PercTable(Conditions_Other ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_Other)
 ```
 
 # Summary for participants who have no health conditions
@@ -401,7 +546,19 @@ PercTable(Conditions_Other ~ Risk, data = asu_merged, rfrq = "111", margins = c(
 ```{r}
 asu_merged$Conditions_No_Conditions <- ifelse(asu_merged$Conditions_No_Conditions == 1, "Yes", NA)
 
-PercTable(Conditions_No_Conditions ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Conditions_No_Conditions)
+```
+
+# Summary for participants who have conditions
+
+```{r}
+PercTable(asu_merged$N_Conditions_b)
+```
+
+# Summary for pariciapnts with no conditions
+
+```{r}
+table(asu_merged$Conditions_No_Conditions)
 ```
 
 #--------------------------------------SECTION2---------------------------------------------------#
@@ -415,207 +572,181 @@ asu_merged$Question_1 <- ifelse(asu_merged$Question_1 == 1, "Yes",
                                   ifelse(asu_merged$Question_1 == 3, "Not sure",
                                          ifelse(asu_merged$Question_1 == 4, "Do not know", NA))))
 
-PercTable(Question_1 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_1)
 ```
 
 # Summary for question 2: How many members of your household tested positive for COVID-19
 
 ```{r}
-PercTable(Question_2 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_2)
 ```
 
 # Summary for question 3: Age of family member 1 who had COVID-19
 
 ```{r}
-PercTable(Question_3 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_3b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_4: How many months since family member 1 last tested positive
 
 ```{r}
-PercTable(Question_4 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_4b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_5: Age of family member 2 who had COVID-19
 
 ```{r}
-PercTable(Question_5 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_5b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_6: How many months since family member 2 last tested positive
 
 ```{r}
-PercTable(Question_6 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_6b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_7: Age of family member one who 3 COVID-19
 
 ```{r}
-PercTable(Question_7 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_7b | factor(Exposure), data = asu_merged)
 ```
 
 #Summary for Question_8: How many months since family member 3 last tested positive
 
 ```{r}
-PercTable(Question_8 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_8b | factor(Exposure), data = asu_merged)
 ```
 
 #Summary for Question_9: Age of family member four who had COVID-19
 
 ```{r}
-PercTable(Question_9 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_9b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_10: How many months since family member 4 last tested positive
 
 ```{r}
-PercTable(Question_10 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_10b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_11: Age of family member 5 who had COVID-19
 
 ```{r}
-PercTable(Question_11 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_11b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_12: How many months since family member 5 last tested positive
 
 ```{r}
-PercTable(Question_12 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table1(~ Question_12b | factor(Exposure), data = asu_merged)
 ```
 
 # Summary for Question_13: Did your children or your family member experience Fever or chills
 
 ```{r}
-table(asu_merged$Question_13_Fever, asu_merged$Risk)
+table(asu_merged$Question_13_Fever, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Cough: Did your children or your family member experience cough
 
 ```{r}
-table(asu_merged$Question_13_Cough, asu_merged$Risk)
+table(asu_merged$Question_13_Cough, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Shortness_of_breath: Did your children or your family member experience Shortness_of_breath
 
 ```{r}
-table(asu_merged$Question_13_Shortness_of_breath, asu_merged$Risk)
+table(asu_merged$Question_13_Shortness_of_breath, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Fatigue: Did your children or your family member experience Fatigue
 
 ```{r}
-table(asu_merged$Question_13_Fatigue, asu_merged$Risk)
+table(asu_merged$Question_13_Fatigue, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Muscle_Body_Aches: Did your children or your family member experience \_Muscle_Body_Aches
 
 ```{r}
-table(asu_merged$Question_13_Muscle_Body_Aches, asu_merged$Risk)
+table(asu_merged$Question_13_Muscle_Body_Aches, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Headache: Did your children or your family member experience Headache
 
 ```{r}
-table(asu_merged$Question_13_Headache, asu_merged$Risk)
+table(asu_merged$Question_13_Headache, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Loss_of_Taste: Did your children or your family member experience Loss_of_Taste
 
 ```{r}
-table(asu_merged$Question_13_Loss_of_Taste, asu_merged$Risk)
+table(asu_merged$Question_13_Loss_of_Taste, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Sore_Throat: Did your children or your family member experience Sore_Throat
 
 ```{r}
-table(asu_merged$Question_13_Sore_Throat, asu_merged$Risk)
+table(asu_merged$Question_13_Sore_Throat, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Congestion: Did your children or your family member experience Congestion
 
 ```{r}
-table(asu_merged$Question_13_Congestion, asu_merged$Risk)
+table(asu_merged$Question_13_Congestion, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Nausea: Did your children or your family member experience Nausea
 
 ```{r}
-table(asu_merged$Question_13_Nausea, asu_merged$Risk)
+table(asu_merged$Question_13_Nausea, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Diarrhea: Did your children or your family member experience Diarrhea
 
 ```{r}
-table(asu_merged$Question_13_Diarrhea, asu_merged$Risk)
+table(asu_merged$Question_13_Diarrhea, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Asymptomatic: Did your children or your family member experience Asymptomatic
 
 ```{r}
-table(asu_merged$Question_13_Asymptomatic, asu_merged$Risk)
+table(asu_merged$Question_13_Asymptomatic, asu_merged$Exposure)
 ```
 
 # Summary for Question_13_Other: Did your children or your family member experience other
 
 ```{r}
-table(asu_merged$Question_13_Other, asu_merged$Risk)
+table(asu_merged$Question_13_Other, asu_merged$Exposure)
 ```
 
 # Summary for Question_14: Describe your symptoms
 
 ```{r}
-table(asu_merged$Question_14, asu_merged$Risk)
+table(asu_merged$Question_14, asu_merged$Exposure)
 ```
 
 # Summary for Question_15:I (or my chidlren) am at risk of getting a COVID-19
 
 ```{r}
-asu_merged$Question_15 <- ifelse(asu_merged$Question_15 == 1, "Strongly Disagree", 
-                            ifelse(asu_merged$Question_15 == 2, "Disagree",
-                                   ifelse(asu_merged$Question_15 == 3, "Neutral",
-                                          ifelse(asu_merged$Question_15 == 4, "Agree",
-                                                 ifelse(asu_merged$Question_15 == 5, "Strongly Agree", NA)))))
-
-PercTable(Question_15 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Risk)
 ```
 
 # Summary for Question_16: My family members are at risk of COVID-19 infection
 
 ```{r}
-asu_merged$Question_16 <- ifelse(asu_merged$Question_16 == 1, "Strongly Disagree", 
-                            ifelse(asu_merged$Question_16 == 2, "Disagree",
-                                   ifelse(asu_merged$Question_16 == 3, "Neutral",
-                                          ifelse(asu_merged$Question_16 == 4, "Agree",
-                                                 ifelse(asu_merged$Question_16 == 5, "Strongly Agree", NA)))))
-
-PercTable(Question_16 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_16b)
 ```
 
 # Summary for Question_17: I feel knowledgeable about the risk of getting COVID-19 infection
 
 ```{r}
-##Question_17
-asu_merged$Question_17 <- ifelse(asu_merged$Question_17 == 1, "Strongly Disagree", 
-                            ifelse(asu_merged$Question_17 == 2, "Disagree",
-                                   ifelse(asu_merged$Question_17 == 3, "Neutral",
-                                          ifelse(asu_merged$Question_17 == 4, "Agree",
-                                                 ifelse(asu_merged$Question_17 == 5, "Strongly Agree", NA)))))
-
-PercTable(Question_17 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_17b)
 ```
 
 # Summary for Question_18: I am worried about the likehood of getting a COVID-19 infection in the near future
 
 ```{r}
-##Question_18
-asu_merged$Question_18 <- ifelse(asu_merged$Question_18 == 1, "Strongly Disagree", 
-                            ifelse(asu_merged$Question_18 == 2, "Disagree",
-                                   ifelse(asu_merged$Question_18 == 3, "Neutral",
-                                          ifelse(asu_merged$Question_18 == 4, "Agree",
-                                                 ifelse(asu_merged$Question_18 == 5, "Strongly Agree", NA)))))
-
-PercTable(Question_18 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_18b)
 ```
 
 # Summary for Question_19:Can we prevent ourselves from getting infected with the COVID-19 virus and/or reduce the severity of infection if infected?
@@ -626,7 +757,7 @@ asu_merged$Question_19 <- ifelse(asu_merged$Question_19 == 1, "Yes",
                                    ifelse(asu_merged$Question_19 == 3, "Not sure",
                                           ifelse(asu_merged$Question_19 == 4, "Do not know", NA))))
 
-PercTable(Question_19 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_19)
 ```
 
 # Summary for Question_20_Basic_Health: Prevention strategies - Basic health and hygiene practices (mask wearing, handwashing, etc.)
@@ -635,7 +766,7 @@ PercTable(Question_19 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_20_Basic_Health <- 
   ifelse(asu_merged$Question_20_Basic_Health == 1, "Yes", NA)
 
-PercTable(Question_20_Basic_Health ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Basic_Health)
 ```
 
 # Summary for Question_20_COVID_19_Vacc: Prevention strategies - Staying up to date with COVID-19 vaccines
@@ -644,7 +775,7 @@ PercTable(Question_20_Basic_Health ~ Risk, data = asu_merged, rfrq = "111", marg
 asu_merged$Question_20_COVID_19_Vacc <- 
   ifelse(asu_merged$Question_20_COVID_19_Vacc == 1, "Yes", NA)
 
-PercTable(Question_20_COVID_19_Vacc ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_COVID_19_Vacc)
 ```
 
 # Summary for Question_20_Improving_ventilation: Prevention strategies
@@ -653,7 +784,7 @@ PercTable(Question_20_COVID_19_Vacc ~ Risk, data = asu_merged, rfrq = "111", mar
 asu_merged$Question_20_Improving_ventilation <- 
   ifelse(asu_merged$Question_20_Improving_ventilation == 1, "Yes", NA)
 
-PercTable(Question_20_Improving_ventilation ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Improving_ventilation)
 ```
 
 # Summary for Question_20_Getting_tested: Prevention strategies
@@ -662,7 +793,7 @@ PercTable(Question_20_Improving_ventilation ~ Risk, data = asu_merged, rfrq = "1
 asu_merged$Question_20_Getting_tested <- 
   ifelse(asu_merged$Question_20_Getting_tested == 1, "Yes", NA)
 
-PercTable(Question_20_Getting_tested ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Getting_tested)
 ```
 
 # Summary for Question_20_Following_recommendations: Prevention strategies
@@ -671,7 +802,7 @@ PercTable(Question_20_Getting_tested ~ Risk, data = asu_merged, rfrq = "111", ma
 asu_merged$Question_20_Following_recommendations <- 
   ifelse(asu_merged$Question_20_Following_recommendations == 1, "Yes", NA)
 
-PercTable(Question_20_Following_recommendations ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Following_recommendations)
 ```
 
 # Summary for Question_20_Staying_home: Prevention strategies
@@ -680,7 +811,7 @@ PercTable(Question_20_Following_recommendations ~ Risk, data = asu_merged, rfrq 
 asu_merged$Question_20_Staying_home <- 
   ifelse(asu_merged$Question_20_Staying_home == 1, "Yes", NA)
 
-PercTable(Question_20_Staying_home ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Staying_home)
 ```
 
 # Summary for Question_20_Seeking: Prevention strategies - Seeking treatment if you have COVID-19 and are at a high risk of getting very sick
@@ -689,7 +820,7 @@ PercTable(Question_20_Staying_home ~ Risk, data = asu_merged, rfrq = "111", marg
 asu_merged$Question_20_Seeking <- 
   ifelse(asu_merged$Question_20_Seeking == 1, "Yes", NA)
 
-PercTable(Question_20_Seeking ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Seeking)
 ```
 
 # Summary for Question_20_Avoiding: Prevention strategies - Avoiding contact with people who have suspected or confirmed COVID-19
@@ -698,7 +829,7 @@ PercTable(Question_20_Seeking ~ Risk, data = asu_merged, rfrq = "111", margins =
 asu_merged$Question_20_Avoiding <- 
   ifelse(asu_merged$Question_20_Avoiding == 1, "Yes", NA)
 
-PercTable(Question_20_Avoiding ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_20_Avoiding)
 ```
 
 # Summary for Question_21: Do you know where to get a COVID-19 vaccine?
@@ -709,7 +840,7 @@ asu_merged$Question_21 <- ifelse(asu_merged$Question_21 == 1, "Yes",
                                    ifelse(asu_merged$Question_21 == 3, "Not sure",
                                           ifelse(asu_merged$Question_21 == 4, "Do not know", NA))))
 
-PercTable(Question_21 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_21)
 ```
 
 #--------------------------------------SECTION3---------------------------------------------------#
@@ -723,7 +854,7 @@ asu_merged$Question_22 <- ifelse(asu_merged$Question_22 == 1, "Yes",
                                    ifelse(asu_merged$Question_22 == 3, "Not sure",
                                           ifelse(asu_merged$Question_22 == 4, "Do not know", NA))))
 
-PercTable(Question_22 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_22)
 ```
 
 # Summary for Question_23: Did you understand the COVID-19 health information provided today?
@@ -734,7 +865,7 @@ asu_merged$Question_23 <- ifelse(asu_merged$Question_23 == 1, "Yes",
                                    ifelse(asu_merged$Question_23 == 3, "Not sure",
                                           ifelse(asu_merged$Question_23 == 4, "Do not know", NA))))
 
-PercTable(Question_23 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_23)
 ```
 
 # Summary for Question_24: Did you receive information on the COVID-19 vaccine today?
@@ -745,7 +876,7 @@ asu_merged$Question_24 <- ifelse(asu_merged$Question_24 == 1, "Yes",
                                    ifelse(asu_merged$Question_24 == 3, "Not sure",
                                           ifelse(asu_merged$Question_24 == 4, "Do not know", NA))))
 
-PercTable(Question_24 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_24)
 ```
 
 # Summary for Question_25: Did you also receive a COVID-19 vaccine today?
@@ -754,7 +885,7 @@ PercTable(Question_24 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_25 <- ifelse(asu_merged$Question_25 == 1, "Yes", 
                             ifelse(asu_merged$Question_25 == 2, "No", NA))
 
-PercTable(Question_25 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_25)
 ```
 
 # Summary for Question_26: Was the COVID-19 vaccine dose you received today your 1st dose?
@@ -763,7 +894,7 @@ PercTable(Question_25 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_26 <- ifelse(asu_merged$Question_26 == 1, "Yes", 
                             ifelse(asu_merged$Question_26 == 2, "No", NA))
 
-PercTable(Question_26 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_26)
 ```
 
 # Summary for Question_27: Were you vaccinated in the past?
@@ -772,7 +903,7 @@ PercTable(Question_26 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_27 <- ifelse(asu_merged$Question_27 == 1, "Yes", 
                             ifelse(asu_merged$Question_27 == 2, "No", NA))
 
-PercTable(Question_27 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_27)
 ```
 
 # Summary for Question_28: Do you plan to get vaccinated in the near future?
@@ -783,7 +914,7 @@ asu_merged$Question_28 <- ifelse(asu_merged$Question_28 == 1, "Yes",
                                    ifelse(asu_merged$Question_28 == 3, "Not sure",
                                           ifelse(asu_merged$Question_28 == 4, "Do not know", NA))))
 
-PercTable(Question_28 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_28)
 ```
 
 # Summary for Question_29: If/when you decide to get vaccinated, do you know where to get a COVID-19 vaccine?
@@ -792,7 +923,7 @@ PercTable(Question_28 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_29 <- ifelse(asu_merged$Question_29 == 1, "Yes", 
                             ifelse(asu_merged$Question_29 == 2, "No", NA))
 
-PercTable(Question_29 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_29)
 ```
 
 # Summary for Question_30_Physician: Who provided the information during the event today? Physician
@@ -801,7 +932,7 @@ PercTable(Question_29 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_30_Physician <- 
   ifelse(asu_merged$Question_30_Physician == 1, "Yes", NA)
 
-PercTable(Question_30_Physician ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Physician)
 ```
 
 # Summary for Question_30_Nurse_Practitioner: Who provided the information during the event today? Nurse Practitioner
@@ -810,7 +941,7 @@ PercTable(Question_30_Physician ~ Risk, data = asu_merged, rfrq = "111", margins
 asu_merged$Question_30_Nurse_Practitioner <- 
   ifelse(asu_merged$Question_30_Nurse_Practitioner == 1, "Yes", NA)
 
-PercTable(Question_30_Nurse_Practitioner ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Nurse_Practitioner)
 ```
 
 # Summary for Question_30_Registered_Nurse: Who provided the information during the event today? Registered Nurse
@@ -819,7 +950,7 @@ PercTable(Question_30_Nurse_Practitioner ~ Risk, data = asu_merged, rfrq = "111"
 asu_merged$Question_30_Registered_Nurse <- 
   ifelse(asu_merged$Question_30_Registered_Nurse == 1, "Yes", NA)
 
-PercTable(Question_30_Registered_Nurse ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Registered_Nurse)
 ```
 
 # Summary for Question_30_Community_Health_Advocate: Who provided the information during the event today? Community Health Advocate
@@ -828,7 +959,7 @@ PercTable(Question_30_Registered_Nurse ~ Risk, data = asu_merged, rfrq = "111", 
 asu_merged$Question_30_Community_Health_Advocate <- 
   ifelse(asu_merged$Question_30_Community_Health_Advocate == 1, "Yes", NA)
 
-PercTable(Question_30_Community_Health_Advocate ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Community_Health_Advocate)
 ```
 
 # Summary for Question_30_Community_Member: Who provided the information during the event today? Community Member
@@ -837,7 +968,7 @@ PercTable(Question_30_Community_Health_Advocate ~ Risk, data = asu_merged, rfrq 
 asu_merged$Question_30_Community_Member <- 
   ifelse(asu_merged$Question_30_Community_Member == 1, "Yes", NA)
 
-PercTable(Question_30_Community_Member ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Community_Member)
 ```
 
 # Summary for Question_30_Other: Who provided the information during the event today? Other
@@ -846,13 +977,13 @@ PercTable(Question_30_Community_Member ~ Risk, data = asu_merged, rfrq = "111", 
 asu_merged$Question_30_Other <- 
   ifelse(asu_merged$Question_30_Other == 1, "Yes", NA)
 
-PercTable(Question_30_Other ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_30_Other)
 ```
 
 # Summary for Question_31: Who provided the information during the event today? specify
 
 ```{r}
-PercTable(Question_31 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_31)
 ```
 
 # Summary for Question_32: Did the information provider during the event today check your understanding of the COVID-19 health information provided including information about the vaccine?
@@ -863,7 +994,7 @@ asu_merged$Question_32 <- ifelse(asu_merged$Question_32 == 1, "Yes",
                                    ifelse(asu_merged$Question_32 == 3, "Not sure",
                                           ifelse(asu_merged$Question_32 == 4, "Do not know", NA))))
 
-PercTable(Question_32 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_32)
 ```
 
 # Summary for Question_33: Were you satisfied with the communication regarding COVID-19 health information including information about the vaccine during the event today?
@@ -874,7 +1005,7 @@ asu_merged$Question_33 <- ifelse(asu_merged$Question_33 == 1, "Yes",
                                    ifelse(asu_merged$Question_33 == 3, "Not sure",
                                           ifelse(asu_merged$Question_33 == 4, "Do not know", NA))))
 
-PercTable(Question_33 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_33)
 ```
 
 # Summary for Question_34: Were you involved in decisions regarding COVID-19 vaccination decisions made today?
@@ -885,7 +1016,7 @@ asu_merged$Question_34 <- ifelse(asu_merged$Question_34 == 1, "Yes",
                                    ifelse(asu_merged$Question_34 == 3, "Not sure",
                                           ifelse(asu_merged$Question_34 == 4, "Do not know", NA))))
 
-PercTable(Question_34 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_34)
 ```
 
 # Summary for Question_35: How confident are you about COVID 19 vaccine after participating in the event today?
@@ -897,7 +1028,7 @@ asu_merged$Question_35 <- ifelse(asu_merged$Question_35 == 1, "Very confident",
                                           ifelse(asu_merged$Question_35 == 4, "Very unconfident", NA))))
 
 
-PercTable(Question_35 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_35)
 ```
 
 # Summary for Question_36: Was the information session you participated in today hosted by a
@@ -909,13 +1040,13 @@ asu_merged$Question_36 <- ifelse(asu_merged$Question_36 == 1, "local church",
                                                        ifelse(asu_merged$Question_36 == 4, "mobile vaccine and/or testing clinics",
                                                               ifelse(asu_merged$Question_36 == 5,  "other community event", NA)))))
 
-PercTable(Question_36 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_36)
 ```
 
 # Summary for Question_37: Please provide the name of the person (s) or organization (s) who provided the information
 
 ```{r}
-PercTable(Question_37 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_37)
 ```
 
 # Summary for Question_38_Handout_flier: How did you hear about the activity you attended today? Handout flier, pamphlet, or brochure
@@ -924,7 +1055,7 @@ PercTable(Question_37 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_38_Handout_flier <- 
   ifelse(asu_merged$Question_38_Handout_flier == 1, "Yes", NA)
 
-PercTable(Question_38_Handout_flier ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Handout_flier)
 ```
 
 # Summary for Question_38_Social_media: How did you hear about the activity you attended today? Social media (TikTok, Instagram, Facebook and Twitter)
@@ -933,7 +1064,7 @@ PercTable(Question_38_Handout_flier ~ Risk, data = asu_merged, rfrq = "111", mar
 asu_merged$Question_38_Social_media <- 
   ifelse(asu_merged$Question_38_Social_media == 1, "Yes", NA)
 
-PercTable(Question_38_Social_media ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Social_media)
 ```
 
 # Summary for Question_38_Standard_media: How did you hear about the activity you attended today? standard medial source (TV, Radio, Newspaper)
@@ -942,7 +1073,7 @@ PercTable(Question_38_Social_media ~ Risk, data = asu_merged, rfrq = "111", marg
 asu_merged$Question_38_Standard_media <- 
   ifelse(asu_merged$Question_38_Standard_media == 1, "Yes", NA)
 
-PercTable(Question_38_Standard_media ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Standard_media)
 ```
 
 # Summary for Question_38_Community_Health_Advocate: How did you hear about the activity you attended today? A community health advocate or any other community professional
@@ -951,7 +1082,7 @@ PercTable(Question_38_Standard_media ~ Risk, data = asu_merged, rfrq = "111", ma
 asu_merged$Question_38_Community_Health_Advocate <- 
   ifelse(asu_merged$Question_38_Community_Health_Advocate == 1, "Yes", NA)
 
-PercTable(Question_38_Community_Health_Advocate ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Community_Health_Advocate)
 ```
 
 # Summary for Question_38_Church_service: How did you hear about the activity you attended today? church service
@@ -960,7 +1091,7 @@ PercTable(Question_38_Community_Health_Advocate ~ Risk, data = asu_merged, rfrq 
 asu_merged$Question_38_Church_service <- 
   ifelse(asu_merged$Question_38_Church_service == 1, "Yes", NA)
 
-PercTable(Question_38_Church_service ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Church_service)
 ```
 
 # Summary for Question_38_Barbershop: How did you hear about the activity you attended today? at the local barbershop
@@ -969,7 +1100,7 @@ PercTable(Question_38_Church_service ~ Risk, data = asu_merged, rfrq = "111", ma
 asu_merged$Question_38_Barbershop <- 
   ifelse(asu_merged$Question_38_Barbershop == 1, "Yes", NA)
 
-PercTable(Question_38_Barbershop ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Barbershop)
 ```
 
 # Summary for Question_38_Community_members: How did you hear about the activity you attended today? from community members, friends, or family members
@@ -978,7 +1109,7 @@ PercTable(Question_38_Barbershop ~ Risk, data = asu_merged, rfrq = "111", margin
 asu_merged$Question_38_Community_members <- 
   ifelse(asu_merged$Question_38_Community_members == 1, "Yes", NA)
 
-PercTable(Question_38_Community_members ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Community_members)
 ```
 
 # Summary for Question_38_Others: How did you hear about the activity you attended today? other
@@ -987,13 +1118,13 @@ PercTable(Question_38_Community_members ~ Risk, data = asu_merged, rfrq = "111",
 asu_merged$Question_38_Others <- 
   ifelse(asu_merged$Question_38_Others == 1, "Yes", NA)
 
-PercTable(Question_38_Others ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_38_Others)
 ```
 
 # Summary for Question_39: How did you hear about the activity you attended today? specify
 
 ```{r}
-PercTable(Question_39 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+table(asu_merged$Question_39)
 ```
 
 # Summary for Question_40: Did your child or children also receive a COVID-19 vaccine today?
@@ -1003,7 +1134,7 @@ asu_merged$Question_40 <- ifelse(asu_merged$Question_40 == 1, "Yes",
                             ifelse(asu_merged$Question_40 == 2, "No",
                                    ifelse(asu_merged$Question_40 == 3, "I do not have childen under 18 in my household", NA)))
 
-PercTable(Question_40 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_40)
 ```
 
 # Summary for Question_41: was the dose you child/children received today their 1st dose
@@ -1012,7 +1143,7 @@ PercTable(Question_40 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_41 <- ifelse(asu_merged$Question_41 == 1, "Yes", 
                             ifelse(asu_merged$Question_41 == 2, "No", NA))
 
-PercTable(Question_41 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_41)
 ```
 
 # Summary for Question_42: was your child/children vaccinated in the past?
@@ -1021,7 +1152,7 @@ PercTable(Question_41 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
 asu_merged$Question_42 <- ifelse(asu_merged$Question_42 == 1, "Yes", 
                             ifelse(asu_merged$Question_42 == 2, "No", NA))
 
-PercTable(Question_42 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_42)
 ```
 
 # Summary for Question_43: do you plan to get you child/children vaccinated in the near future?
@@ -1032,7 +1163,7 @@ asu_merged$Question_43 <- ifelse(asu_merged$Question_43 == 1, "Yes",
                                                 ifelse(asu_merged$Question_43 == 3, "Not sure",
                                                        ifelse(asu_merged$Question_43 == 4, "Do not know", NA))))
 
-PercTable(Question_43 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_43)
 ```
 
 #--------------------------------------SECTION4---------------------------------------------------# Vaccine Hesitancy Qustions
@@ -1048,7 +1179,7 @@ asu_merged$Question_44 <- ifelse(asu_merged$Question_44 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_44 == 4, "Agree",
                                                  ifelse(asu_merged$Question_44 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_44 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_44)
 ```
 
 # Summary for Question_45: Dying from the COVID-19 vaccine is of concern
@@ -1061,7 +1192,7 @@ asu_merged$Question_45 <- ifelse(asu_merged$Question_45 == 1, "Strongly Disagree
                                                  ifelse(asu_merged$Question_45 == 5, "Strongly Agree", NA)))))
 
 
-PercTable(Question_45 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_45)
 ```
 
 # Summary for Question_46: Heart disease from the COVID-19 vaccine is of concern
@@ -1073,7 +1204,7 @@ asu_merged$Question_46 <- ifelse(asu_merged$Question_46 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_46 == 4, "Agree",
                                                  ifelse(asu_merged$Question_46 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_46 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_46)
 ```
 
 # Summary for Question_47: Blood clots from the COVID-19 vaccine is of concern
@@ -1085,7 +1216,7 @@ asu_merged$Question_47 <- ifelse(asu_merged$Question_47 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_47 == 4, "Agree",
                                                  ifelse(asu_merged$Question_47 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_47 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_47)
 ```
 
 # Summary for Question_48: The COVID-19 vaccine leads to miscarriages and is not appropriate for pregnant women
@@ -1097,7 +1228,7 @@ asu_merged$Question_48 <- ifelse(asu_merged$Question_48 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_48 == 4, "Agree",
                                                  ifelse(asu_merged$Question_48 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_48 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_48)
 ```
 
 # Summary for Question_49: High blood pressure from the COVID-19 vaccine is of concern
@@ -1109,7 +1240,7 @@ asu_merged$Question_49 <- ifelse(asu_merged$Question_49 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_49 == 4, "Agree",
                                                  ifelse(asu_merged$Question_49 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_49 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_49)
 ```
 
 # Summary for Question_50: COVID-19 vaccine implants a "computer chip" in the body
@@ -1121,7 +1252,7 @@ asu_merged$Question_50 <- ifelse(asu_merged$Question_50 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_50 == 4, "Agree",
                                                  ifelse(asu_merged$Question_50 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_50 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_50)
 ```
 
 # Summary for Question_51: COVID-19 vaccine components remain in the human body for a long period of time
@@ -1133,7 +1264,7 @@ asu_merged$Question_51 <- ifelse(asu_merged$Question_51 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_51 == 4, "Agree",
                                                  ifelse(asu_merged$Question_51 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_51 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_51)
 ```
 
 # Summary for Question_52: Pain from/related to COVID-19 vaccine is of concern.
@@ -1145,7 +1276,7 @@ asu_merged$Question_52 <- ifelse(asu_merged$Question_52 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_52 == 4, "Agree",
                                                  ifelse(asu_merged$Question_52 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_52 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_52)
 ```
 
 # Summary for Question_53: COVID-19 vaccine is NOT an effective way to protect against COVID-19.
@@ -1157,7 +1288,7 @@ asu_merged$Question_53 <- ifelse(asu_merged$Question_53 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_53 == 4, "Agree",
                                                  ifelse(asu_merged$Question_53 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_53 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_53)
 ```
 
 # Access Barriers
@@ -1171,7 +1302,7 @@ asu_merged$Question_54 <- ifelse(asu_merged$Question_54 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_54 == 4, "Agree",
                                                  ifelse(asu_merged$Question_54 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_54 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_54)
 ```
 
 # Summary for Question_55: : It is inconvenient to get the COVID-19 vaccine
@@ -1183,7 +1314,7 @@ asu_merged$Question_55 <- ifelse(asu_merged$Question_55 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_55 == 4, "Agree",
                                                  ifelse(asu_merged$Question_55 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_55 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_55)
 ```
 
 # Summary for Question_56: : There is a shortage of the COVID-19 vaccine
@@ -1195,7 +1326,7 @@ asu_merged$Question_56 <- ifelse(asu_merged$Question_56 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_56 == 4, "Agree",
                                                  ifelse(asu_merged$Question_56 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_56 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_56)
 ```
 
 # Summary for Question_57: : The clinics/venues that provide the COVID-19 vaccine are too far away
@@ -1207,7 +1338,7 @@ asu_merged$Question_57 <- ifelse(asu_merged$Question_57 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_57 == 4, "Agree",
                                                  ifelse(asu_merged$Question_57 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_57 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_57)
 ```
 
 # Information Barriers
@@ -1221,7 +1352,7 @@ asu_merged$Question_58 <- ifelse(asu_merged$Question_58 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_58 == 4, "Agree",
                                                  ifelse(asu_merged$Question_58 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_58 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_58)
 ```
 
 # Summary for Question_59: : I am confused by the information about the COVID-19 vaccines
@@ -1233,7 +1364,7 @@ asu_merged$Question_59 <- ifelse(asu_merged$Question_59 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_59 == 4, "Agree",
                                                  ifelse(asu_merged$Question_59 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_59 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_59)
 ```
 
 # Summary for Question_60: : I don't know where I can get accurate information about the COVID-19 vaccines
@@ -1245,7 +1376,7 @@ asu_merged$Question_60 <- ifelse(asu_merged$Question_60 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_60 == 4, "Agree",
                                                  ifelse(asu_merged$Question_60 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_60 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_60)
 ```
 
 # Summary for Question_61: : I don't know where I can get trustworthy information about the COVID-19 vaccines
@@ -1257,7 +1388,7 @@ asu_merged$Question_61 <- ifelse(asu_merged$Question_61 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_61 == 4, "Agree",
                                                  ifelse(asu_merged$Question_61 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_61 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_61)
 ```
 
 # Trust Barriers
@@ -1271,7 +1402,7 @@ asu_merged$Question_62 <- ifelse(asu_merged$Question_62 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_62 == 4, "Agree",
                                                  ifelse(asu_merged$Question_62 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_62 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_62)
 ```
 
 # Summary for Question_63: : I don't trust the scientists/professionals who recommend the COVID-19 vaccines
@@ -1283,7 +1414,7 @@ asu_merged$Question_63 <- ifelse(asu_merged$Question_63 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_63 == 4, "Agree",
                                                  ifelse(asu_merged$Question_63 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_63 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_63)
 ```
 
 # Summary for Question_64: : I don't trust the government agencies that approved the COVID-19 vaccines
@@ -1295,7 +1426,7 @@ asu_merged$Question_64 <- ifelse(asu_merged$Question_64 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_64 == 4, "Agree",
                                                  ifelse(asu_merged$Question_64 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_64 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_64)
 ```
 
 # Summary for Question_65: : I don't trust the pharmaceutical companies that manufacture the COVID-19 vaccines
@@ -1307,7 +1438,7 @@ asu_merged$Question_65 <- ifelse(asu_merged$Question_65 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_65 == 4, "Agree",
                                                  ifelse(asu_merged$Question_65 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_65 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_65)
 ```
 
 # Summary for Question_66: : I don't trust media that recommend the COVID-19 vaccines
@@ -1319,7 +1450,7 @@ asu_merged$Question_66 <- ifelse(asu_merged$Question_66 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_66 == 4, "Agree",
                                                  ifelse(asu_merged$Question_66 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_66 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_66)
 ```
 
 # Religious Barriers
@@ -1333,7 +1464,7 @@ asu_merged$Question_67 <- ifelse(asu_merged$Question_67 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_67 == 4, "Agree",
                                                  ifelse(asu_merged$Question_67 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_67 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_67)
 ```
 
 # Summary for Question_68: : The COVID-19 vaccines' ingredients are banned by my religion therefore I cannot get the COVID-19 vaccine
@@ -1345,7 +1476,7 @@ asu_merged$Question_68 <- ifelse(asu_merged$Question_68 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_68 == 4, "Agree",
                                                  ifelse(asu_merged$Question_68 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_68 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_68)
 ```
 
 # Summary for Question_69: : It is better to use spiritual/holy preventive measures (e.g., holy water, holy oil, cross, holy amulets, etc.) to prevent getting sick from COVID-19 than
@@ -1357,7 +1488,7 @@ asu_merged$Question_69 <- ifelse(asu_merged$Question_69 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_69 == 4, "Agree",
                                                  ifelse(asu_merged$Question_69 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_69 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_69)
 ```
 
 # Summary for Question_70: : It is better to use natural preventive methods (e.g., essential oils, other natural drinks, tonics etc.) to prevent getting infected with COVID-19 than getting the vaccine
@@ -1369,7 +1500,7 @@ asu_merged$Question_70 <- ifelse(asu_merged$Question_70 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_70 == 4, "Agree",
                                                  ifelse(asu_merged$Question_70 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_70 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_70)
 ```
 
 # Summary for Question_71: : It is better to get sick of COVID-19 and for your body to fight it off, building natural immunity than getting the vaccine rinks, tonics etc.) to prevent getting infected with COVID-19 than getting the vaccine
@@ -1381,7 +1512,7 @@ asu_merged$Question_71 <- ifelse(asu_merged$Question_71 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_71 == 4, "Agree",
                                                  ifelse(asu_merged$Question_71 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_71 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_71)
 ```
 
 #--------------------------------------SECTION5---------------------------------------------------#
@@ -1395,7 +1526,7 @@ asu_merged$Question_72 <- ifelse(asu_merged$Question_72 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_72 == 4, "Agree",
                                                  ifelse(asu_merged$Question_72 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_72 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_72)
 ```
 
 # Summary for Question_73: : I am willing to get vaccinated if My health care provider recommended me to get the COVID-19 vaccine
@@ -1407,7 +1538,7 @@ asu_merged$Question_73 <- ifelse(asu_merged$Question_73 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_73 == 4, "Agree",
                                                  ifelse(asu_merged$Question_73 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_73 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_73)
 ```
 
 # Summary for Question_74: : I am willing to get vaccinated if My nurse recommended me to get the COVID-19 vaccine
@@ -1419,7 +1550,7 @@ asu_merged$Question_74 <- ifelse(asu_merged$Question_74 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_74 == 4, "Agree",
                                                  ifelse(asu_merged$Question_74 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_74 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_74)
 ```
 
 # Summary for Question_75: : I am willing to get vaccinated if My spiritual advisor (such as pastor/priest/rabbi/imam) recommended me to get the COVID-19 vaccine
@@ -1431,7 +1562,7 @@ asu_merged$Question_75 <- ifelse(asu_merged$Question_75 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_75 == 4, "Agree",
                                                  ifelse(asu_merged$Question_75 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_75 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_75)
 ```
 
 # Summary for Question_76: : I am willing to get vaccinated if My family members recommended me to get the COVID-19 vaccine
@@ -1443,7 +1574,7 @@ asu_merged$Question_76 <- ifelse(asu_merged$Question_76 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_76 == 4, "Agree",
                                                  ifelse(asu_merged$Question_76 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_76 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_76)
 ```
 
 # Summary for Question_77: : I am willing to get vaccinated if My colleagues/co-workers recommended me to get the COVID-19 vaccine
@@ -1455,7 +1586,7 @@ asu_merged$Question_77 <- ifelse(asu_merged$Question_77 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_77 == 4, "Agree",
                                                  ifelse(asu_merged$Question_77 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_77 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_77)
 ```
 
 # Summary for Question_78: : I am willing to get vaccinated if...- I need to learn more about COVID-19 vaccination, its side effects, benefits, and future implications
@@ -1467,7 +1598,7 @@ asu_merged$Question_78 <- ifelse(asu_merged$Question_78 == 1, "Strongly Disagree
                                           ifelse(asu_merged$Question_78 == 4, "Agree",
                                                  ifelse(asu_merged$Question_78 == 5, "Strongly Agree", NA)))))
 
-PercTable(Question_78 ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$Question_78)
 ```
 
 # Summary for data_source: pen and paper or qualtrics
@@ -1478,5 +1609,5 @@ asu_merged$data_source <- ifelse(asu_merged$data_source == 1, "Pen and Paper sur
                             ifelse(asu_merged$data_source == 2, "Pen and Paper survey",
                                    ifelse(asu_merged$data_source == 3, "Qualtrics", NA)))
 
-PercTable(data_source ~ Risk, data = asu_merged, rfrq = "111", margins = c(1,2))
+PercTable(asu_merged$data_source)
 ```
